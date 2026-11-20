@@ -1,0 +1,214 @@
+[
+ {
+  "name": "Microstrip 50Ω",
+  "family": "IPC",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 3.022133085396376
+  },
+  "note": "w/h=1.89（適用域 0.1~3.0）"
+ },
+ {
+  "name": "Stripline 50Ω",
+  "family": "IPC",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.14351380430131053
+  },
+  "note": "w/h=0.72, t/h=0.18"
+ },
+ {
+  "name": "Embedded Microstrip 50Ω",
+  "family": "IPC",
+  "grade": "🟡",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.23210398032664706
+  },
+  "note": "h1/h=2.5 ≥ 1.2 適用"
+ },
+ {
+  "name": "Asymmetric Stripline 50Ω",
+  "family": "IPC",
+  "grade": "🟠",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.19525712403198703
+  },
+  "note": "修正因子 0.875 併入反函數"
+ },
+ {
+  "name": "Broadside Stripline 50Ω",
+  "family": "IPC",
+  "grade": "🟠",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.18548800574904165
+  },
+  "note": ""
+ },
+ {
+  "name": "Diff Microstrip Zd=100Ω",
+  "family": "IPC",
+  "grade": "🟡",
+  "target": 100,
+  "forward": 100.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.23831484218701326,
+   "d_mm": 0.2
+  },
+  "note": "耦合因子併入指數"
+ },
+ {
+  "name": "Diff Stripline Zd=100Ω",
+  "family": "IPC",
+  "grade": "🟡",
+  "target": 100,
+  "forward": 100.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.10210381458940353,
+   "d_mm": 0.15
+  },
+  "note": ""
+ },
+ {
+  "name": "Coax 50Ω (do=3mm)",
+  "family": "解析",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "di_mm": 0.8716033847755468
+  },
+  "note": "PTFE er=2.2"
+ },
+ {
+  "name": "Parallel Wire 120Ω (d=1mm)",
+  "family": "解析",
+  "grade": "🟢",
+  "target": 120,
+  "forward": 119.99999999999999,
+  "residual_pct": 1.1842378929335004e-14,
+  "iterations": "—",
+  "geometry": {
+   "s_mm": 1.5430806348152437
+  },
+  "note": ""
+ },
+ {
+  "name": "CPW 78.33Ω (s反解)",
+  "family": "DOC2",
+  "grade": "🔴",
+  "target": 78.33,
+  "forward": 78.33000000000003,
+  "residual_pct": 3.628457733997703e-14,
+  "iterations": 6,
+  "geometry": {
+   "s_mm": 0.5000718963475886
+  },
+  "note": "對照 DOC-002 正向基準 s=0.5 → 反解 s=0.5001"
+ },
+ {
+  "name": "Diff Stripline(保角) Zd=57.95Ω",
+  "family": "DOC2",
+  "grade": "🔴",
+  "target": 57.95,
+  "forward": 57.95000000000002,
+  "residual_pct": 2.452261383123728e-14,
+  "iterations": 6,
+  "geometry": {
+   "w_mm": 0.10001252203439841,
+   "s_mm": 0.1
+  },
+  "note": "對照 DOC-002 正向基準 w=0.1 → 反解 w=0.1000"
+ },
+ {
+  "name": "6L_foil L1 50Ω",
+  "family": "Stackup",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.4795383552336566
+  },
+  "note": "microstrip, Tpd=5.441 ns/m"
+ },
+ {
+  "name": "6L_foil L3 50Ω",
+  "family": "Stackup",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.24381832476615045
+  },
+  "note": "stripline, Tpd=6.831 ns/m"
+ },
+ {
+  "name": "6L_foil L4 50Ω",
+  "family": "Stackup",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.24381832476615045
+  },
+  "note": "stripline, Tpd=6.831 ns/m"
+ },
+ {
+  "name": "6L_foil L6 50Ω",
+  "family": "Stackup",
+  "grade": "🟢",
+  "target": 50,
+  "forward": 50.0,
+  "residual_pct": 0.0,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.4795383552336566
+  },
+  "note": "microstrip, Tpd=5.441 ns/m"
+ },
+ {
+  "name": "6L_foil L3 Zd=100Ω",
+  "family": "Stackup",
+  "grade": "🟡",
+  "target": 100,
+  "forward": 99.99999999999999,
+  "residual_pct": 1.4210854715202004e-14,
+  "iterations": "—",
+  "geometry": {
+   "w_mm": 0.1711900391132462,
+   "d_mm": 0.2
+  },
+  "note": "stripline_diff"
+ }
+]

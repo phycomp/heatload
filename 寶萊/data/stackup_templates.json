@@ -1,0 +1,143 @@
+{
+  "Rigid": {
+    "4_layer_rigid": {
+      "description": "4層剛性板 (Core Build)",
+      "layers": [
+        {"name": "L1 Top",      "type": "signal",   "material": "Copper",     "thickness_um": 35,  "copper_weight": "1oz"},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L2 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 1200, "dk": 4.5, "df": 0.020},
+        {"name": "L3 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L4 Bottom",   "type": "signal",   "material": "Copper",     "thickness_um": 35,  "copper_weight": "1oz"}
+      ],
+      "total_thickness_um": 1470
+    },
+    "6_layer_rigid_foil": {
+      "description": "6層剛性板 (Foil Build, 成本優化)",
+      "layers": [
+        {"name": "L1 Top",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg 1080","type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L2 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 500, "dk": 4.5, "df": 0.020},
+        {"name": "L3 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg 1080","type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L4 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 500, "dk": 4.5, "df": 0.020},
+        {"name": "L5 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg 1080","type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L6 Bottom",   "type": "signal",   "material": "Copper",     "thickness_um": 35}
+      ],
+      "total_thickness_um": 1410
+    },
+    "8_layer_rigid": {
+      "description": "8層剛性板 (機械鑽孔 L1-L8)",
+      "layers": [
+        {"name": "L1 Top",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L2 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 300, "dk": 4.5, "df": 0.020},
+        {"name": "L3 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L4 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 300, "dk": 4.5, "df": 0.020},
+        {"name": "L5 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L6 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 300, "dk": 4.5, "df": 0.020},
+        {"name": "L7 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L8 Bottom",   "type": "signal",   "material": "Copper",     "thickness_um": 35}
+      ],
+      "total_thickness_um": 1520
+    },
+    "10_layer_rigid": {
+      "description": "10層剛性板",
+      "layers": [
+        {"name": "L1 Top",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L2 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L3 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L4 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L5 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L6 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L7 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L8 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L9 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L10 Bottom",  "type": "signal",   "material": "Copper",     "thickness_um": 35}
+      ],
+      "total_thickness_um": 1520
+    }
+  },
+  "RF_Core_Build": {
+    "4_layer_rf_core": {
+      "description": "4層RF Core Build (高性能外層)",
+      "layers": [
+        {"name": "L1 Top",      "type": "signal",   "material": "Copper",     "thickness_um": 18},
+        {"name": "RF Core",     "type": "core",     "material": "Rogers_RO4350B", "thickness_um": 254, "dk": 3.66, "df": 0.0037},
+        {"name": "L2 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 800, "dk": 4.5, "df": 0.020},
+        {"name": "L3 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "RF Core",     "type": "core",     "material": "Rogers_RO4350B", "thickness_um": 254, "dk": 3.66, "df": 0.0037},
+        {"name": "L4 Bottom",   "type": "signal",   "material": "Copper",     "thickness_um": 18}
+      ],
+      "total_thickness_um": 1546
+    }
+  },
+  "Flex_Rigid": {
+    "4_layer_flex_rigid": {
+      "description": "4層剛撓結合板 (Rigid-Flex)",
+      "layers": [
+        {"name": "L1 Rigid",    "type": "signal",   "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L2 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 400, "dk": 4.5, "df": 0.020},
+        {"name": "Flex Adhesive","type": "adhesive","material": "Acrylic",    "thickness_um": 50},
+        {"name": "Flex Core",   "type": "core",     "material": "Polyimide",  "thickness_um": 50,  "dk": 3.4, "df": 0.018},
+        {"name": "Flex Adhesive","type": "adhesive","material": "Acrylic",    "thickness_um": 50},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 400, "dk": 4.5, "df": 0.020},
+        {"name": "L3 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L4 Rigid",    "type": "signal",   "material": "Copper",     "thickness_um": 35}
+      ],
+      "total_thickness_um": 1220
+    }
+  },
+  "HDI": {
+    "10_layer_3press_hdi": {
+      "description": "10層3壓合HDI (Laser + Mechanical Drill)",
+      "layers": [
+        {"name": "L1 Top",      "type": "signal",   "material": "Copper",     "thickness_um": 18},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 60,  "dk": 4.5, "df": 0.020},
+        {"name": "L2 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 18},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L3 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L4 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 18},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L5 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L6 PWR",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 200, "dk": 4.5, "df": 0.020},
+        {"name": "L7 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 18},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 80,  "dk": 4.5, "df": 0.020},
+        {"name": "L8 GND",      "type": "plane",    "material": "Copper",     "thickness_um": 35},
+        {"name": "Core",        "type": "core",     "material": "FR-4",       "thickness_um": 100, "dk": 4.5, "df": 0.020},
+        {"name": "L9 SIG",      "type": "signal",   "material": "Copper",     "thickness_um": 18},
+        {"name": "Prepreg",     "type": "prepreg",  "material": "FR-4",       "thickness_um": 60,  "dk": 4.5, "df": 0.020},
+        {"name": "L10 Bottom",  "type": "signal",   "material": "Copper",     "thickness_um": 18}
+      ],
+      "total_thickness_um": 1268
+    }
+  }
+}

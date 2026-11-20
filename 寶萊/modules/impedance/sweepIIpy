@@ -1,0 +1,55 @@
+# 修復 param_sweep 的 bug：參數名映射
+"""
+參數掃描引擎
+"""
+import numpy as np
+import pandas as pd
+from .solver import forward_calc
+
+_PARAM_MAP = {
+    "w_mm": "w",
+    "h_mm": "h",
+    "t_um": "t",
+    "er": "er"
+}
+
+
+def param_sweep(tline_type, sweep_param, sweep_vals, fixed_params):
+    """
+    單參數掃描
+    sweep_param: 'w_mm', 'h_mm', 't_um', 'er'
+    sweep_vals:  掃描值數組
+    fixed_params: dict {w, h, t, er, freq_ghz}
+    返回 DataFrame
+    """
+    key = _PARAM_MAP.get(sweep_param, sweep_param)
+    results = []
+    for val in sweep_vals:
+        p = dict(fixed_params)
+        p[key] = val
+        z0, e_eff = forward_calc(
+            tline_type, p["w"], p["h"], p["t"], p["er"], p.get("freq_ghz", 0.0)
+        )
+        results.append({
+            sweep_param: val,
+            "Z0": z0,
+            "e_eff": e_eff
+        })
+    return pd.DataFrame(results)
+
+
+def freq_sweep(tline_type, w, h, t, er, freqs_ghz):
+    """
+    頻率掃描
+    freqs_ghz: 頻率數組 (GHz)
+    返回 DataFrame
+    """
+    results = []
+    for f in freqs_ghz:
+        z0, e_eff = forward_calc(tline_type, w, h, t, er, f)
+        results.append({
+            "freq_ghz": f,
+            "Z0": z0,
+            "e_eff": e_eff
+        })
+    return pd.DataFrame(results)

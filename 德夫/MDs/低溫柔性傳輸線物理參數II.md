@@ -1,0 +1,308 @@
+# 低溫柔性傳輸線 (Cri/oFlex) 物理推導公式
+
+## 1. 基本架構與幾何參數
+
+### 1.1 帶狀線 (Stripline) 幾何
+```
+    接地平面 (Ground Plane)
+    ←───────────────────────→
+            ↑ d (介電層厚度)
+    ═══════════════════════  ← 訊號線 (Signal Trace)
+            ↓ w (線寬)
+            ↑ h (基板厚度)
+    ───────────────────────  ← 接地平面
+
+    s = 通道間距 (channel pitch)
+```
+
+**幾何參數定義:**
+
+- $w$: 訊號線寬度 (m)
+- $t$: 導體厚度 (m)
+- $h$: 基板厚度 (m)
+- $s$: 相鄰通道間距 (m)
+- $L$: 傳輸線長度 (m)
+- $\epsilon_r$: 基板相對介電常數 (Kapton: ~3.4)
+
+## 2. 超導電動力學基礎
+
+### 2.1 倫敦方程式 (London Equations)
+
+超導電流密度 $\mathbf{J}_s$ 與電磁場的關係:
+
+$$\frac{\partial \mathbf{J}_s}{\partial t} = \frac{n_s e^2}{m_e} \mathbf{E} = \frac{1}{\mu_0 \lambda_L^2} \mathbf{E}$$
+
+**倫敦穿透深度 (London Penetration Depth):**
+
+$$\lambda_L = \sqrt{\frac{m_e}{\mu_0 n_s e^2}} = \lambda_{L,0} \frac{1}{\sqrt{1 - (T/T_c)^4}}$$
+
+其中:
+
+- $\lambda_{L,0}$: 零溫穿透深度 (NbTi: ~50 nm, Nb: ~40 nm, Al: ~16 nm)
+- $n_s$: 超導電子密度 (Cooper pairs)
+- $T_c$: 臨界溫度 (NbTi: 9.2 K)
+
+### 2.2 Mattis-Bardeen 理論 (複電導率)
+
+在微波頻率下，超導體的複電導率:
+
+$$\sigma = \sigma_1 - j\sigma_2$$
+
+**實部 (準粒子損耗):**
+$$\sigma_1 = \frac{2\sigma_n}{\hbar\omega} \int_{\Delta}^{\infty} \frac{[f(E) - f(E+\hbar\omega)] \cdot (E^2 + \Delta^2 + \hbar\omega E)}{\sqrt{E^2 - \Delta^2} \cdot \sqrt{(E+\hbar\omega)^2 - \Delta^2}} dE$$
+
+**虛部 (超導響應):**
+$$\sigma_2 = \frac{\pi\sigma_n\Delta}{\hbar\omega} \tanh\left(\frac{\hbar\omega}{2k_BT}\right)$$
+
+其中能隙:
+$$\Delta = 1.76 \cdot k_B T_c \cdot \tanh\left(1.74\sqrt{\frac{T_c}{T} - 1}\right)$$
+
+## 3. 動態電感推導 (Kinetic Inductance)
+
+### 3.1 動能儲存推導
+
+超導電子的動能密度:
+$$u_k = \frac{1}{2} n_s m_e v_s^2 = \frac{1}{2} \frac{m_e}{n_s e^2} J_s^2 = \frac{1}{2} \mu_0 \lambda_L^2 J_s^2$$
+
+總動能:
+$$U_k = \frac{1}{2} L_k I^2 = \frac{1}{2} \mu_0 \lambda_L^2 \int_S J_s^2 dS$$
+
+### 3.2 薄膜極限下的動態電感
+
+**情況 A: 厚膜 ($t \gg \lambda_L$)**
+
+電流僅在表面 $\lambda_L$ 深度流動:
+$$L_k = \frac{\mu_0 \lambda_L}{2w} \quad [H/m]$$
+
+**情況 B: 薄膜 ($t \ll \lambda_L$)**
+
+電流均勻分佈:
+$$L_k = \frac{\mu_0 \lambda_L^2}{w \cdot t} \quad [H/m]$$
+
+**情況 C: 一般厚度 (精確公式)** [^27^]
+
+$$L_k = \frac{\mu_0 \lambda_L}{4w} \left[ \coth\left(\frac{t}{2\lambda_L}\right) + \text{csch}^2\left(\frac{t}{2\lambda_L}\right) \right]$$
+
+或等效表示為:
+$$L_{int} = L_k + L_m = \frac{\mu_0 \lambda_L}{2} \coth\left(\frac{t}{2\lambda_L}\right) \quad [H/\square]$$
+
+其中 $L_m$ 為磁電感，$L_k$ 為動態電感。
+
+### 3.3 溫度依賴性
+
+$$L_k(T) = L_k(0) \cdot \frac{1}{1 - (T/T_c)^4}$$
+
+## 4. 傳輸線參數推導
+
+### 4.1 單位長度電感
+
+**幾何電感 (Magnetic Inductance):**
+
+對於帶狀線 (Stripline):
+$$L_g = \frac{\mu_0 h}{w} \cdot K_g$$
+
+其中 $K_g$ 為幾何修正因子 (考慮邊緣場效應):
+$$K_g \approx 1 + \frac{2h}{\pi w} \ln\left(1 + \frac{\pi w}{2h}\right)$$
+
+**總電感 (超導態):**
+$$L_{total} = L_g + L_k = \frac{\mu_0 h}{w} + \frac{\mu_0 \lambda_L^2}{w \cdot t_{eff}}$$
+
+其中 $t_{eff} = t \cdot \tanh(t/2\lambda_L) / (t/2\lambda_L)$ 為有效厚度。
+
+### 4.2 單位長度電容
+
+$$C = \frac{\epsilon_0 \epsilon_r w}{h} \cdot K_c$$
+
+其中 $K_c$ 為電容修正因子。
+
+對於多層結構 (如 Cri/oFlex 的 Kapton 基板):
+$$C = \epsilon_0 \epsilon_r \frac{w}{h} \left(1 + \frac{\epsilon_r - 1}{\epsilon_r} \cdot \frac{h_{poly}}{h}\right)^{-1}$$
+
+### 4.3 特性阻抗
+
+$$Z_0 = \sqrt{\frac{L_{total}}{C}} = \sqrt{\frac{L_g + L_k}{C}}$$
+
+**超導態下的修正:**
+$$Z_0 = Z_{0,normal} \cdot \sqrt{1 + \frac{L_k}{L_g}}$$
+
+其中 $Z_{0,normal} = \sqrt{L_g/C}$ 為正常態阻抗。
+
+### 4.4 相速度與有效介電常數
+
+**相速度:**
+$$v_p = \frac{1}{\sqrt{L_{total} C}} = \frac{c}{\sqrt{\epsilon_{eff}}} \cdot \frac{1}{\sqrt{1 + L_k/L_g}}$$
+
+**有效介電常數:**
+$$\epsilon_{eff} = \epsilon_r \left(1 + \frac{L_k}{L_g}\right)$$
+
+**波長縮短因子:**
+$$\lambda_g = \frac{v_p}{f} = \frac{\lambda_0}{\sqrt{\epsilon_{eff}(1 + L_k/L_g)}}$$
+
+## 5. 衰減與損耗機制
+
+### 5.1 表面阻抗 (Surface Impedance)
+
+$$Z_s = R_s + jX_s = R_s + j\omega L_{tot}$$
+
+**表面電阻 (超導態):** [^27^]
+
+$$R_s = \frac{\sigma_1}{\sigma_1^2 + \sigma_2^2} \cdot \frac{1}{t_{eff}}$$
+
+在 $T \ll T_c$ 且 $\hbar\omega \ll 2\Delta$ 極限下:
+$$R_s \approx \frac{1}{2} \sigma_1 \cdot (\omega \mu_0 \lambda_L)^2 \cdot t_{eff}$$
+
+**20mK 時的近似:**
+$$R_s(20\text{mK}) \approx R_{residual} \sim 10^{-9} \text{ to } 10^{-6} \, \Omega/\square$$
+
+### 5.2 衰減常數
+
+**導體損耗:**
+$$\alpha_c = \frac{R_s}{2 Z_0 w} \quad [Np/m]$$
+
+**介電損耗:**
+$$\alpha_d = \frac{\pi f}{v_p} \tan\delta = \frac{\omega \sqrt{\epsilon_{eff}}}{2c} \tan\delta$$
+
+其中 $\tan\delta$ 為損耗角正切 (Kapton @ 20mK: ~$10^{-4}$)。
+
+**總衰減:**
+$$\alpha_{total} = \alpha_c + \alpha_d + \alpha_{rad}$$
+
+在 20mK 超導態下，$\alpha_c \approx 0$，主要為介電損耗。
+
+## 6. 耦合傳輸線與串擾
+
+### 6.1 互電容與互電感
+
+對於兩條平行帶狀線 (間距 $s$):
+
+**互電容:**
+$$C_m = \frac{\epsilon_0 \epsilon_r w}{2\pi s} \cdot \exp\left(-\frac{s}{h}\right) \quad [F/m]$$
+
+**互電感:**
+$$L_m = \frac{\mu_0 h}{2\pi s} \cdot \exp\left(-\frac{s}{h}\right) \quad [H/m]$$
+
+**耦合係數:**
+$$k_c = \frac{C_m}{C}, \quad k_L = \frac{L_m}{L_{total}}$$
+
+### 6.2 奇偶模分析 (Even-Odd Mode Analysis) [^32^]
+
+**偶模 (Even Mode):** 兩線同相電流
+$$Z_{0e} = \sqrt{\frac{L_{total} + L_m}{C - C_m}}$$
+
+**奇模 (Odd Mode):** 兩線反相電流
+$$Z_{0o} = \sqrt{\frac{L_{total} - L_m}{C + C_m}}$$
+
+**耦合強度:**
+$$K = \frac{Z_{0e} - Z_{0o}}{Z_{0e} + Z_{0o}} \approx \frac{1}{2} \left(\frac{C_m}{C} + \frac{L_m}{L_{total}}\right)$$
+
+### 6.3 串擾公式推導
+
+**耦合傳輸線方程:**
+
+對線 1 (激勵線) 和線 2 (耦合線):
+$$\frac{dV_1}{dz} = -L_{total} \frac{dI_1}{dt} - L_m \frac{dI_2}{dt}$$
+$$\frac{dV_2}{dz} = -L_m \frac{dI_1}{dt} - L_{total} \frac{dI_2}{dt}$$
+
+$$\frac{dI_1}{dz} = -C \frac{dV_1}{dt} + C_m \frac{dV_2}{dt}$$
+$$\frac{dI_2}{dz} = C_m \frac{dV_1}{dt} - C \frac{dV_2}{dt}$$
+
+**前向耦合係數:**
+$$K_f = \frac{1}{2} \left(C_m Z_0 - \frac{L_m}{Z_0}\right)$$
+
+**後向耦合係數:**
+$$K_b = \frac{1}{2} \left(C_m Z_0 + \frac{L_m}{Z_0}\right)$$
+
+### 6.4 NEXT (近端串擾) 推導
+
+對於弱耦合 ($K \ll 1$)，在位置 $z$ 處的耦合電壓:
+$$dV_{2,NEXT}(z) = \frac{j\omega}{2} \left(\frac{L_m}{Z_0} + C_m Z_0\right) V_1(z) dz$$
+
+積分整條線長 (考慮相位同步):
+$$V_{2,NEXT}(L) = \int_0^L \frac{j\omega K_b}{2} V_1(0) e^{-j\beta z} e^{-\alpha z} dz$$
+
+假設 $V_1(z) = V_0 e^{-j\beta z}$，且 $V_2$ 在 $z=0$ 處測量:
+
+$$V_{2,NEXT} = \frac{j\omega K_b L}{2} V_0 \cdot \frac{1 - e^{-2j\beta L}}{2j\beta L} \cdot e^{-\alpha L}$$
+
+**NEXT (dB):**
+$$S_{31} = 20\log_{10}\left|\frac{V_{2,NEXT}}{V_0}\right| = 20\log_{10}\left|\frac{\omega K_b L}{2} \cdot \text{sinc}\left(\frac{2\beta L}{2\pi}\right) \cdot e^{-\alpha L}\right|$$
+
+簡化:
+$$S_{31} \approx 20\log_{10}\left(\frac{\omega K_b L}{2}\right) - 8.686\alpha L + 20\log_{10}|\text{sinc}(2L/\lambda_g)|$$
+
+**物理意義:**
+
+- 與頻率成正比 ($\propto f$)
+- 與長度無關 (飽和效應，因 sinc 函數振盪)
+- 受衰減抑制
+
+### 6.5 FEXT (遠端串擾) 推導
+
+遠端 ($z=L$) 的耦合電壓:
+$$V_{2,FEXT}(L) = \int_0^L \frac{j\omega K_f}{2} V_0 e^{-j\beta z} e^{-j\beta(L-z)} e^{-\alpha L} dz$$
+
+$$V_{2,FEXT} = \frac{j\omega K_f L}{2} V_0 e^{-j\beta L} e^{-\alpha L}$$
+
+**FEXT (dB):**
+$$S_{41} = 20\log_{10}\left|\frac{V_{2,FEXT}}{V_0}\right| = 20\log_{10}\left(\frac{\omega K_f L}{2}\right) - 8.686\alpha L$$
+
+**物理意義:**
+- 與頻率和長度都成正比 ($\propto f \cdot L$)
+- 相位延遲 $e^{-j\beta L}$
+- 無 sinc 振盪 (前向波相位同步)
+
+### 6.6 等電平 FEXT (EL-FEXT)
+
+補償插入損耗後的 FEXT:
+$$\text{EL-FEXT} = S_{41} - S_{21} = 20\log_{10}\left(\frac{\omega K_f L}{2}\right)$$
+
+## 7. 20mK 極低溫特殊效應
+
+### 7.1 超導態參數總結 (NbTi @ 20mK)
+
+| 參數 | 符號 | 數值 | 單位 |
+|------|------|------|------|
+| 臨界溫度 | $T_c$ | 9.2 | K |
+| 倫敦穿透深度 | $\lambda_L$ | ~50 | nm |
+| 動態電感 | $L_k$ | ~50 | pH/sq |
+| 表面電阻 | $R_s$ | ~$10^{-9}$ | $\Omega$/sq |
+| 能隙 | $\Delta$ | 1.4 | meV |
+
+### 7.2 與室溫比較
+
+| 特性 | 300 K (Ag) | 20 mK (NbTi) | 比值 |
+|------|------------|--------------|------|
+| 電阻率 | $1.6\times10^{-8}$ | $<10^{-20}$ | $>10^{12}$ |
+| 表面阻抗 | m$\Omega$/sq | n$\Omega$/sq | $10^6$ |
+| 動態電感 | 0 | ~50 pH/sq | - |
+| 衰減 @ 6GHz | ~5 dB/m | ~0.001 dB/m | $10^4$ |
+
+## 8. Cri/oFlex 設計公式總結
+
+### 8.1 設計流程
+
+1. **選擇幾何**: $w, h, s$ 滿足阻抗與串擾要求
+2. **計算動態電感**: $L_k(T)$ 基於溫度與材料
+3. **計算總電感**: $L_{total} = L_g + L_k$
+4. **驗證阻抗**: $Z_0 = \sqrt{L_{total}/C} \approx 50\Omega$
+5. **計算串擾**: NEXT, FEXT @ target frequency
+6. **驗證規格**: NEXT, FEXT < -40 dB
+
+### 8.2 關鍵設計方程
+
+**阻抗設計:**
+$$Z_0 \approx \frac{60}{\sqrt{\epsilon_r}} \ln\left(\frac{4h}{w}\right) \cdot \sqrt{1 + \frac{\lambda_L^2}{h \cdot t}}$$
+
+**串擾估算 (簡化):**
+$$\text{NEXT} \approx 20\log_{10}\left(\frac{\pi f}{c} \cdot \frac{s}{h} \cdot \frac{L}{\sqrt{1 + L_k/L_g}}\right) - 40$$
+
+**熱負載估算:**
+$$P_{heat} = \frac{1}{2} R_s \cdot |J_s|^2 \cdot w \cdot L \cdot t_{eff} \sim 10^{-9} \text{ W/channel}$$
+
+## 參考文獻
+
+- [27] Hornsby, A. (2020). Development of Microstrip-Coupled Lumped-Element Kinetic Inductance Detectors. Cardiff University.
+- [28] Anlage et al. Magnetic penetration depth measurements with superconducting microstrip resonators.
+- [30] Mazin, B. A. (2010). Thin film dielectric microstrip kinetic inductance detectors. APL.
+- [32] Kang et al. (1997). Simple formulae for kinetic inductance of coupled superconducting microstrip lines. JAP 81, 1829.
+- [34] Current distribution, resistance, and inductance for superconducting strip transmission lines. Physica C.

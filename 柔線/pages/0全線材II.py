@@ -1,0 +1,3 @@
+from streamlit import empty
+from 傳輸線Util import get_cable_specifications_table
+get_cable_specifications_table()

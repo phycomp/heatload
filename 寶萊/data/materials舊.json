@@ -1,0 +1,10 @@
+# 1. data/materials.json
+materials_json = """{
+  "FR-4": {"dk": 4.50, "df": 0.0200, "category": "standard"},
+  "FR-4_HighTg": {"dk": 4.40, "df": 0.0150, "category": "standard"},
+  "Rogers_RO4350B": {"dk": 3.66, "df": 0.0037, "category": "high_frequency"},
+  "Rogers_RO4003C": {"dk": 3.55, "df": 0.0027, "category": "high_frequency"},
+  "Megtron_6": {"dk": 3.70, "df": 0.0020, "category": "high_speed"},
+  "Isola_Itera_MW": {"dk": 3.45, "df": 0.0030, "category": "high_frequency"},
+  "Teflon_PTFE": {"dk": 2.10, "df": 0.0002, "category": "high_frequency"}
+}"""

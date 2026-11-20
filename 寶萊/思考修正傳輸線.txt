@@ -1,0 +1,121 @@
+Two issues found in smoke test:
+DS proven: unique=False, mono=False — the conformal diff stripline is NOT monotone decreasing in w over [1e-5, 20] on log grid. Why? Z_diff = 2·Z0o, ko = tanh(πw/2b)/tanh(π(w+s)/2b). As w→∞: ko → 1, Z0o→0, so Z_diff→0 (decreasing overall). But wait — as w increases, ko increases → K(ko')/K(ko) decreases → Z0o decreases → monotone decreasing... Hmm, but at w→0: ko → 0·/tanh(πs/2b) = 0 → elliptic_ratio(0) = (1/π)ln(2(1+1)/(1-1)) = ∞ → Z_diff → ∞. So it should be monotone decreasing. Unless numerical: for very small w, ko extremely small, kp = sqrt(1-ko²)→1, ratio huge — fine. Hmm, but as w gets LARGE (approaching 20mm with b=0.2), tanh saturates at 1, ko → 1/tanh(large)... ko→1 exactly at some point → elliptic_ratio(1) returns 0.0. Then Z_diff = 0 for all larger w → diff(fs) = 0, not < 0 → mono check fails (needs strictly < 0). Also fs flat → still monotone non-increasing; uniqueness holds on the active region but my strict check fails due to plateau at 0.
+Also possible: non-monotonic region in the middle? Let me think: ko(w) increases with w → ratio K(ko')/K(ko) decreases with ko → Z0o decreases in w. Should be strictly decreasing until saturation. So the failure is just the saturation plateau (Z=0 for huge w) making diffs = 0. Fix: restrict hi bound to something meaningful (e.g., w_hi = 5b or where Z_diff < tiny fraction of target) and use np.diff(fs) <= tiny tolerance: mono = all(diff <= 1e-12). Better: adaptive hi: w_hi = min(20, bracket-based). Simpler: change grid hi to 2.0 (w up to 10×b) — but generality... I'll set w_hi = max(5b, w_lo*1e3)? For the general _proven_solve, allow plateau: mono_strict = all(diff < 0) on subarray up to last positive f. Cleaner: define monotone = all(np.diff(fs[:last_active+1]) < 0) where last_active = last index with fs > 0... Actually just check monotonicity where fs > tiny: mask = fs > 1e-12; mono = all(diff(fs[mask]) < 0). And uniqueness: sign change count == 1 among full array (with saturation, after crossing zero f stays 0... signbit(0)=False so f=0 counts as negative side; fine, one crossing).
+Wait also DS unique=False reported: because mono False → unique=mono False. Fix mono computation.
+κ⊥w 捷徑誤差 = 0.00% — my correction_factor_residual is wrong! I computed z_naive = 120/√er · kappa where kappa = elliptic_ratio(ko). But that's EXACTLY Z_diff/... wait: Z_diff = 2·Z0o = 2·(60/√er)·ratio(ko) = (120/√er)·ratio(ko). So z_naive equals F exactly — the "naive" formula IS exact. My premise was flawed: κ = elliptic_ratio(ko) is the exact factorization with ko(w) genuinely depending on w, but the factorization itself is exact — the error of the "pretend κ⊥w" shortcut isn't measured this way. What the shortcut actually means: compute w from Z_strip(w)·κ(w_est) treating κ frozen at some estimate. The real justification for 🔴: κ depends on w (through ko), so you cannot separate; no closed-form inversion of ko(w) exists. The quantification should be: if one used κ estimated at w₀=initial guess and applied II.6-style inversion with frozen κ, how big is the resulting impedance error? Let me redefine: w_naive = solve (B exp(−Z*/(A·κ₀)) − t)/0.8-form... but the log-family form doesn't apply to conformal. Simpler quantification: relative sensitivity (w/κ)·dκ/dw — if large, κ⊥w assumption invalid. Compute S = |d ln Z/d ln w| contribution via κ: d ln Z/d ln w|_κ = (w/κ)dκ/dw. Report that. For w=0.1,s=0.1,b=0.2: compute numerically. Let me estimate: ko = tanh(πw/2b)/tanh(π(w+s)/2b), πw/2b = 0.785, tanh=0.6556; π(w+s)/2b = π·0.2/0.4=1.5708, tanh=0.9172; ko=0.7148. d ko/dw: numerator' = (π/2b)sech²(πw/2b) = 7.854·sech²(0.785)=7.854·(1−0.6556²)=7.854·0.5702=4.478. denominator' = 7.854·sech²(1.5708)=7.854·(1−0.9172²)=7.854·0.1587=1.246. dko/dw = (4.478·0.9172 − 0.6556·1.246)/0.9172² = (4.107−0.817)/0.8413 = 3.91. dkappa/dw = dK-ratio/dko · dko/dw. K ratio r(ko)=K(ko')/K(ko), dr/dko ≈ ? numerically. Sensitivity is clearly O(1) — large. So report S_κ = (w/Z)·dZ/dw|via κ vs total. I'll implement: dZ_dw_total = dZ/dw numeric; dZ_dw_via_kappa = (120/√er)·dr/dko·dko/dw. And the shortcut error: freeze κ at w0=b/4=0.05: compute w_naive such that (120/√er)·κ(w0)·... no—the naive shortcut needs a forward model form Z = f_log(w)·κ₀. Doesn't exist for conformal.
+Reframe honestly in doc: the factorization Z = (120/√er)·κ(w) is exact but κ(w) has no closed-form inverse and (w/κ)dκ/dw = O(1) — quantify that sensitivity to show w-dependence is first-order (not perturbative), hence 🔴. Implement correction_factor_residual → kappa_sensitivity(w,s,b,er) returning S = (w/κ)|dκ/dw| ≈ value ~0.5-1.5 and interpret: |S| ≫ 0 ⇒ 不可分離 ⇒ 🔴. Let me just compute numerically and print.
+Also note DS proven found w=0.1 correctly despite mono flag — fine after fix.
+Also CPW s=0.5001 vs 0.5 — tiny grid/bisection artifact, actually bisection 200 iters should nail it; 0.5001? log grid over [1e-5,50], bracket then 200 bisections → precision ~ bracket/2^200 — machine. Newton polish tol=1e-12 on x... The reported 0.5001 might be rounding of 0.50007? Hmm target 78.33 has only 2 decimals; true s for exactly 78.33: DOC-002 used s=0.5→78.33 rounded. OK fine.
+Also "HJ+Wheeler w=3.1031 vs t→0 退回 3.192412"? Wait — t→0 should make w LARGER? With t>0, w_eff = w+Δw > w, so for same Z0 you need smaller actual w — 3.1031 < 3.1924 ✓ correct direction. And HJ(50Ω, h=1.6, er=4.2) closed-form inverse would be ~? HJ forward of w=3.1924 with t=0... fine.
+Fix the two issues and re-run. Then FEM.
+執行 Python 程式碼
+請求
+import re
+with open('/mnt/agents/output/tl_synthesis.py', encoding='utf-8') as f:
+    lib = f.read()
+
+# --- 修正 1：飽和平台期導致嚴格單調檢查誤判；改為「正值活動區內嚴格遞減＋全區單一符號變化」 ---
+old = '''    ws = np.logspace(np.log10(w_lo), np.log10(w_hi), grid)
+    fs = np.array([f(w) for w in ws])
+    mono = np.all(np.diff(fs) < 0)                      # 嚴格遞減檢查
+    sign_change = np.where(np.diff(np.signbit(fs)))[0]
+    if len(sign_change) == 0:
+        return None, dict(certificate="FAILED: 區間內無符號變化", monotone=mono)
+    assert len(sign_change) == 1 or mono, "單調但多根？檢查數值噪聲"'''
+new = '''    ws = np.logspace(np.log10(w_lo), np.log10(w_hi), grid)
+    fs = np.array([f(w) for w in ws])
+    # 活動區（f > 0）內須嚴格遞減；飽和平台（f=0）不影響單調性判定
+    act = fs > 1e-10
+    mono = bool(np.all(np.diff(fs[act]) < 0)) if act.sum() > 1 else True
+    sign_change = np.where(np.diff(np.signbit(fs)))[0]
+    if len(sign_change) == 0:
+        return None, dict(certificate="FAILED: 區間內無符號變化", monotone=mono)
+    assert mono, "活動區非嚴格遞減：反演不具唯一性，禁止使用"'''
+assert old in lib
+lib = lib.replace(old, new)
+
+# --- 修正 2：κ⊥w 誤差函數改為敏感度證據（舊版因子分解本身精確，前提有誤） ---
+old2_start = lib.index("def correction_factor_residual")
+old2_end = lib.index("def _proven_solve")
+new2 = '''def kappa_sensitivity(w, s, b, er=4.2):
+    """🔴 分類的定量證據（DOC-003 §II.8A）。
+    保角映射差分 Stripline 可精確分解 Z = (120/√εᵣ)·κ(w)，但 κ 經 kₒ(w) 依賴 w。
+    計算敏感度 S = (w/κ)·|dκ/dw|：S = O(1) 表示 w 依賴為一階（非微擾），
+    κ 不可凍結 ⇒ 無閉式反演 ⇒ 必須列 🔴 牛頓迭代。
+    回傳 (S, dZ_dw_total, dZ_dw_via_kappa)。"""
+    hw = 1e-6 * max(w, 1e-9)
+    ko = lambda ww: np.tanh(np.pi*ww/(2*b)) / max(np.tanh(np.pi*(ww+s)/(2*b)), 1e-12)
+    kappa = lambda ww: elliptic_ratio(np.clip(ko(ww), 0, 1))
+    dkap_dw = (kappa(w+hw) - kappa(w-hw)) / (2*hw)
+    S = abs(w/kappa(w) * dkap_dw)
+    dZ_total = (diff_stripline_conformal(w+hw, s, b, er)["Z_diff"]
+                - diff_stripline_conformal(w-hw, s, b, er)["Z_diff"]) / (2*hw)
+    dZ_kappa = (120.0/np.sqrt(er)) * dkap_dw
+    return S, dZ_total, dZ_kappa
+
+
+'''
+lib = lib[:old2_start] + new2 + lib[old2_end:]
+
+with open('/mnt/agents/output/tl_synthesis.py', 'w', encoding='utf-8') as f:
+    f.write(lib)
+
+import importlib
+import tl_synthesis as tls
+importlib.reload(tls)
+
+w, cert = tls.diff_stripline_conformal_w_proven(57.95, 0.1, 0.2, 4.2)
+print("DS proven:", round(w, 4), cert["certificate"], "| monotone:", cert["monotone"], "| unique:", cert["unique"])
+w, cert = tls.cpw_solve_s_proven(78.33, 0.3, 1.6, 4.2)
+print("CPW proven:", round(w, 4), cert["certificate"], "| monotone:", cert["monotone"], "| unique:", cert["unique"])
+S, dZt, dZk = tls.kappa_sensitivity(0.1, 0.1, 0.2, 4.2)
+print("κ 敏感度 S = %.3f（O(1) ⇒ w 依賴一階，κ 不可凍結 ⇒ 🔴 成立）" % S)
+print("  dZ/dw 總效應 = %.2f Ω/mm，其中經 κ 路徑 = %.2f Ω/mm（佔比 %.0f%%）"
+      % (dZt, dZk, abs(dZk/dZt)*100))
+# 誤差界 + 新模板回歸
+eb = tls.inverse_error_bound("diff_microstrip", dict(dZ0=0.5, dh=0.01, dd=0.01),
+                             target_z0=100, h=0.2, d=0.2, t=0.035, er=4.2)
+print("誤差界(diff_ms): total=%.4f mm (%.2f%%)" % (eb["total_bound_mm"], eb["total_bound_pct"]))
+for tpl in tls.TEMPLATES:
+    sk = tls.Stackup.from_polar_template(tpl)
+    ok = all(sk.assign(l, target_z0=50)["residual_pct"] < 1e-6 for l in sk.tpl["signal_layers"])
+    print(f"{tpl:<18} 全層指派回歸: {'PASS' if ok else 'FAIL'}")
+回應
+DS proven: 0.1 PASS | monotone: True | unique: True
+CPW proven: 0.5001 PASS | monotone: True | unique: True
+κ 敏感度 S = 0.511（O(1) ⇒ w 依賴一階，κ 不可凍結 ⇒ 🔴 成立）
+  dZ/dw 總效應 = -296.11 Ω/mm，其中經 κ 路徑 = -296.11 Ω/mm（佔比 100%）
+誤差界(diff_ms): total=0.0266 mm (11.17%)
+6L_foil_build      全層指派回歸: PASS
+6L_core_build      全層指派回歸: PASS
+Error:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+Cell In[4], line 69
+     67 for tpl in tls.TEMPLATES:
+     68     sk = tls.Stackup.from_polar_template(tpl)
+---> 69     ok = all(sk.assign(l, target_z0=50)["residual_pct"] < 1e-6 for l in sk.tpl["signal_layers"])
+     70     print(f"{tpl:<18} 全層指派回歸: {'PASS' if ok else 'FAIL'}")
+
+Cell In[4], line 69, in <genexpr>(.0)
+     67 for tpl in tls.TEMPLATES:
+     68     sk = tls.Stackup.from_polar_template(tpl)
+---> 69     ok = all(sk.assign(l, target_z0=50)["residual_pct"] < 1e-6 for l in sk.tpl["signal_layers"])
+     70     print(f"{tpl:<18} 全層指派回歸: {'PASS' if ok else 'FAIL'}")
+
+File /mnt/agents/output/tl_synthesis.py:360, in Stackup.assign(self, layer, target_z0, target_zd, section, d)
+    358 if section is None:
+    359     section = "microstrip" if layer in (1, self.tpl["n"]) else "stripline"
+--> 360 h = self.h_for(layer, section)
+    361 warn = ""
+    362 if layer in self.tpl.get("blind_via_layers", []):
+
+File /mnt/agents/output/tl_synthesis.py:353, in Stackup.h_for(self, layer, section)
+    351 def h_for(self, layer, section):
+    352     key = "h_microstrip_um" if "microstrip" in section else "h_stripline_um"
+--> 353     return self.tpl[key][layer] / 1000.0
+
+KeyError: 2
+思考已完成
+8L template: signal layer 2 → default section = "stripline" (since layer 2 is not outer), but h_stripline_um only has {4:300, 5:300}. In 8L foil build, L2 is under L1 with blind microvia — L2 is an outer-ish signal (between L1 plane? planes are 3,6). L2 signal references plane L3? h_stripline for layer 2 missing. My 8L h_microstrip_um has {1:57, 8:57, 2:70, 7:70} — I intended L2/L7 as microstrip-ish (signal over prepreg to plane). But assign auto-picks section by outer-layer rule: layer 2 → "stripline". Fix: make section inference smarter: if layer in h_microstrip_um and not in h_stripline_um → microstrip. Patch h_for/assign: choose section by availability:
+Python

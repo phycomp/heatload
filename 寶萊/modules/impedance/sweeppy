@@ -1,0 +1,46 @@
+# 6. modules/impedance/sweep.py
+# 参数扫描引擎
+import numpy as np
+import pandas as pd
+from .solver import forward_calc
+
+
+def param_sweep(tline_type, sweep_param, sweep_vals, fixed_params):
+    """
+    单参数扫描
+    sweep_param: 'w', 'h', 't', 'er'
+    sweep_vals:  扫描值数组
+    fixed_params: dict {w, h, t, er, freq_ghz}
+    返回 DataFrame
+    """
+    results = []
+    for val in sweep_vals:
+        p = dict(fixed_params)
+        p[sweep_param] = val
+        z0, e_eff = forward_calc(
+            tline_type, p["w"], p["h"], p["t"], p["er"], p.get("freq_ghz", 0.0)
+        )
+        results.append({
+            sweep_param: val,
+            "Z0": z0,
+            "e_eff": e_eff
+        })
+    return pd.DataFrame(results)
+
+
+def freq_sweep(tline_type, w, h, t, er, freqs_ghz):
+    """
+    频率扫描
+    freqs_ghz: 频率数组 (GHz)
+    返回 DataFrame
+    """
+    results = []
+    for f in freqs_ghz:
+        z0, e_eff = forward_calc(tline_type, w, h, t, er, f)
+        results.append({
+            "freq_ghz": f,
+            "Z0": z0,
+            "e_eff": e_eff
+        })
+    return pd.DataFrame(results)
+

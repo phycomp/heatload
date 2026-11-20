@@ -1,0 +1,168 @@
+
+ REGEN3.3   Run on linux Fri Jun 26 15:31:31 2026          
+ Version: 3.3.2   Nov 3, 2009                                          
+ ..... Input data read  for a new case,  nrun=1000,  newcas= 1,  kase= 1
+ Thermodynamic input parameters
+ Reduction factor for expansion space cooling...  COOLING_MULT     1.0000E+00
+ Inflow gas temperature at cold end (K)...        GAS_TEMP_COLD    8.0000E+01
+ Inflow gas temperature at hot end (K)...         GAS_TEMP_HOT     3.3000E+02
+ Normalized initial temperature at midpoint...    MID_TEMP_RATIO   5.0000E-01
+ Reduction factor for matrix conductivity...      MAT_COND_FACTOR  1.0000E+00
+ Multiplicative factor for matrix heat capacity.  MAT_CP_FACTOR    1.0000E+00
+ Parameter to select linear gas conductivity...   USE_GAS_COND     0
+ Parameter to select helium type ...              HELIUM           4
+ Parameter to select ideal gas properties...      USE_IDEAL_GAS    0
+ Parameter to select linear matrix conductivity...USE_MAT_COND     0
+ Parameter to select linear matrix heat capacity. USE_MAT_CPVOL    0
+ Max temp used in matrix heat cap table(K)...     TABLE_TEMP_MAX   4.6200E+02
+ Min temp used in matrix heat cap table(K)...     TABLE_TEMP_MIN   4.8000E+01
+ Parameter to select properties table...          USE_PROPS_TABLE  0
+
+ Input for geometric properties
+ Parameter to select geometry...                  GEOMETRY         4
+ Hydraulic diameter (m)...                        HYDRA_DIAM       4.1400E-05
+ Multiplicative factor for heat transfer...       HT_FACTOR        1.0000E+00
+ Multiplicative factor for pressure gradient...   P_GRAD_FACTOR    1.0000E+00
+ Porosity of the matrix...                        POROSITY         6.2000E-01
+ Cross sectional area of regenerator (m**2)...    RG_AREA          7.9200E-04
+ Regenerator length (m)...                        RG_LENGTH        1.1000E-01
+
+ Material specification
+ Parameter to select the material structure...    MATERIAL_FORM      1
+ Parameter to select the material ...             MATERIAL          31
+
+ Fluid flow properties
+ Frequency of the mass flux (1/s)...              HERZ             1.3000E+01
+ Mass flux at cold end (kg/s)...                  MASS_FLUX_COLD   4.3200E-03
+
+ Input to control Newton iteration for pressure ratio
+ Select iteration for pressure ratio...           FIND_PRATIO      0
+ Pressure target for Newton iteration (Pa)...     AVE_PRES         1.7500E+06
+ Target for phase between mass and pressure (deg).PRES_PHASE       2.5400E+01
+ Target for pressure ratio at cold end...         PRES_RATIO       1.5000E+00
+
+ Parameters to control numerical resolution
+ To select the order of boundary approximation... BDY_ORDER        1
+ To select the type of boundary conditions...     BDY_TYPE         2
+ E-fold time for temp change on inflow (cycle)... DECAY_CYC        5.0000E-02
+ Convergence limit for Newton iteration...        EPS_NEWTON       1.0000E-06
+ To control smoothing in heat transfer...         HTALP            4.0000E-02
+ To control smoothing in heat transfer...         HTGAM            2.0000E+00
+ Method used to approximate time derivative..     METHOD             1
+ Number of mesh points along regenerator...       NUM_POINTS_X      21
+ Number of time steps per cycle...                NUM_STEPS_CYC     80
+ Include advection terms in energy equation...    USE_ADVEC          1
+
+ Parameters to control output
+ Duration of the integration (cycle)...           FINAL_CYCLE         10
+ Increment for full printed output (cycle)...     FULL_OUTPUT_INC     10
+ Number of points for time series output...       MUSHIS            0
+ To control initialization and continuation .     NEWCAS            1
+ To select plot output...                         NPLOT             2
+ Increment for partial output (cycle)...          OUTPUT_INC          10
+ Control printing at PLOT_INC increments..        NPR_PLOT           0
+ Increment for graphical output (cycle)...        PLOT_INC         1.2500E-01
+ Parameter to select separate output for each caseUSE_CASE_RGPR    0
+ Parameter to save output for restart ...         USE_SAVE            0
+ Parameter to print to standard output...         USE_STDOUT          0
+ --------------- END INPUT DATA -----------------------
+
+ BASIC OUTPUT  nsteps=     800  time:cycles=      10.000
+      itfail=     0 ittave=3.18E+00 resave=6.88E+00 jacave=1.54E-01
+ Maximum CFL parameter over cycle                           CFLMAX= 1.397E+00
+ Enthalpy+heat flux average   across regenerator  (W)       EHTAVE= 1.963E+01
+ Enthalpy+heat flux variation across regenerator  (W)       EHTDIF= 1.051E+01
+ Enthalpy+heat flux at cold side of regenerator (W)         EHTFLX= 1.523E+01
+ Energy balance for the gas over the cycle (W)              ENGBAL=-8.881E-02
+ Rate of change in gas energy over the cycle (W)            ENGDIF= 2.186E-03
+ Normed matrix temperature at midpoint                      GTPNRM= 5.015E-01
+ Matrix energy balance using MEGDIF  (W)                    MEGBAL=-9.972E-02
+ Rate of change matrix thermal energy over cycle (W)        MEGDIF= 1.042E+01
+ Average cold end pressure over the cycle (Pa)              PAVE  = 1.750E+06
+ Phase angle of mass flow at right rel to pressure (deg)    PHSPRM= 2.540E+01
+ Ratio of maximum to minimum pressure at cold end           PRATIO= 1.500E+00
+ Change in cold end pressure over cycle (Pa)                PRDIF = 2.328E-10
+ Rate of change of matrix thermal energy (W)                QINTW = 1.032E+01
+ Energy transfer rate from gas to matrix over cycle (W)     QINT  = 6.497E+00
+
+ FULL OUTPUT  time:cycles=      10.000
+ Heat capacity of flowing gas  (J/K)                        CAPF  = 5.535E-01
+ Heat capacity of regenerator matrix  (J/K)                 CAPR  = 4.954E+01
+ Heat capacity of gas in void volume  (J/K)                 CAPV  = 1.303E+00
+ Relative heat transfer per half cycle                      CNTU  = 5.684E+03
+ Average pressure drop in regenerator   (Pa)                DELPAV= 1.539E+05
+ Maximum  pressure drop over cycle  (Pa)                    DELPMX= 2.095E+05
+ Normalized maximum  pressure drop                          DLPMXN= 1.197E-01
+ Rate of positive enthalpy flux at cold end (W)             EHTPOS= 6.063E+02
+ Second law efficiency                                      EFFIC=  3.396E-01
+ Energy+heat flux average across regenerator (W)            EHXAVE= 1.975E+01
+ Energy+heat flux variation across regenerator  (W)         EHXDIF= 1.057E+01
+ Energy+heat flux at cold side of regenerator (W)           EHXFLX= 1.531E+01
+ Enthalpy flux at cold side of regenerator (W)              ENTFLX= 9.461E+00
+ Gas cross-sectional area (m^2)                             GASAR=  4.910E-04
+ Specific gas cross-sectional area (m^2*s/kg)               GASARS= 1.137E-01
+ Gas volume in regenerator (m^3))                           GASVO=  5.401E-05
+ Ratio regenerator gas vol. to expansion space peak vol.    GASVOR= 5.478E+00
+ Adjusted gross refrigeration power (W)                     GRCADJ= 6.385E+01
+ Isothermal gross refrigeration power (W)                   GRCOOL= 6.385E+01
+ Maximum difference in gas temp over cycle (K)              GTPDIF= 2.482E-02
+ Thermal flux from matrix at right side (W)                 HTFLUX= 5.771E+00
+ Thermal flux from matrix at left side (W)                  HTFLX0= 9.592E+00
+ Maximum heat transfer coefficient over cycle  (W/(m**2-s)  HTFMAX= 1.375E+04
+ Average of heat transfer coeff over the cycle  (W/m**2-s)  HTIAVE= 7.830E+03
+ Ineffectiveness                                            INEFCT= 2.899E-03
+ Normalization for ineffectiveness  (W)                     INEFNM= 1.788E+03
+ Mass of gas at the end of the cycle  (kg)                  MASS  = 2.583E-04
+ Peak mass flux rate at warm(left) end (kg/s)               MASFX0= 7.354E-03
+ Peak mass flux rate at cold(right) end (kg/s)              MASFX1= 4.318E-03
+ Alternate rate matrix thermal energy from temp (W)         ME2DIF= 1.042E+01
+ Matrix energy balance using ME2DIF (W)                     MG2BAL=-9.972E-02
+ Heat capacity of matrix  ( J/K)                            MHTCAP= 4.950E+01
+ Maximum difference in matrix temp over cycle  (K)          MTPDIF= 2.482E-02
+ Coefficient of performance                                 NTACOP= 8.233E-02
+ Adjusted net refrigeration power (W)                       NTCADJ= 5.290E+01
+ Phase angle of pressure drop rel to pressure (deg)         PDPPHS= 5.972E+01
+ Phase angle of compression vol rel to pressure (deg)       PHSCV = 1.796E+02
+ Phase angle of expansion vol rel to pressure (deg)         PHSEV =-8.619E+01
+ Phase angle mass flow cold rel to mass flow hot end (deg)  PHSMAS=-3.663E+01
+ Phase angle mass flow cold rel to pressure hot end (deg)   PHSMPH= 3.319E+00
+ Phase angle of mass flow at left rel to pressure (deg)     PHSPLM= 6.203E+01
+ Phase angle of Temp at midpoint rel to pressure (deg)      PHSTPM=-2.570E+01
+ Phase angle of left end pressure rel to pressure (deg)     PLRPHS= 2.208E+01
+ Maximum pressure over the cycle (Pa)                       PMAX  = 2.237E+06
+ Minimum pressure over the cycle (Pa)                       PMIN  = 1.150E+06
+ Normalized pressure amplitude                              PNORM = 3.105E-01
+ Portion of enthalpy flux due to pressurization (W)         PRLOSS= 4.277E+00
+ Ratio of maximum to minimum pressure at hot end            PRTLFT= 1.945E+00
+ Peak value of compression volume     (m**3)                PTVMX1= 8.985E-05
+ Peak value of expansion volume     (m**3)                  PTVMX2= 9.860E-06
+ Additional(lost)warm end P-V work due to finite delta T(W) PVLOSS= 7.672E+01
+ P-V work by pres drop at the warm end   (W)                PVWKPR=-4.448E+02
+ P-V work done by gas at the warm end   (W)                 PVWK0T=-6.425E+02
+ P-V work at warm end computed using cold end pressure (W)  PVWK0 =-1.978E+02
+ P-V work done by gas at the cold end   (W)                 PVWK1 = 6.813E+01
+ Relative penetration of gas from left                      RELLFT= 7.540E-01
+ Relative penetration of gas from right                     RELRHT= 3.070E-01
+ Maximum Reynolds no. in gas over cycle                     RENMAX= 4.168E+01
+ Regenerator loss (W)                                       RGLOSS= 5.184E+00
+ Entropy flux at hot end using cold end pres (W/K)          SFLUX0=-7.327E-01
+ Entropy flux at cold end             (W/K)                 SFLUX1=-8.229E-01
+ Entropy flux at hot end using hot end pressure (W/K)       SFLXP0=-1.847E+00
+ Alternate calculation of entropy flux at warm end (W/K)    SF0ALT=-5.573E-01
+ Alternate calculation of entropy flux at cold end (W/K)    SF1ALT=-7.582E-01
+ Normalized gas temperature amplitude                       TNORM = 2.049E-02
+ Maximum velocity in gas over cycle (m/s)                   UABMAX= 4.684E+00
+
+ Mesh      mass flux     mass flux     heat flux      enthalpy enthalpy+heat
+ index   pos average      pos peak      integral      integral      integral
+              (kg/s)        (kg/s)       (W)           (W)           (W)    
+   1       4.471E-03     6.965E-03     9.592E+00     1.598E+01     2.572E+01
+   5       4.191E-03     6.542E-03     9.752E+00     1.347E+01     2.338E+01
+   9       3.889E-03     6.077E-03     8.928E+00     1.146E+01     2.053E+01
+  13       3.552E-03     5.548E-03     8.024E+00     1.011E+01     1.825E+01
+  17       3.166E-03     4.953E-03     6.916E+00     9.164E+00     1.618E+01
+  21       2.748E-03     4.318E-03     5.771E+00     9.461E+00     1.531E+01
+
+ Case complete, kase=  1 cycles=    10.00 cpu time (s)= 2.9342E-01
+
+ ..... REGEN3.3  done:     nrun= 1000     Fri Jun 26 15:31:32 2026        

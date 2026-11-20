@@ -1,0 +1,58 @@
+{
+  "FR-4": {
+    "dk": 4.50,
+    "df": 0.0200,
+    "dk_freq_coeff": {"type": "constant", "value": 4.50},
+    "df_freq_model": {"type": "constant", "value": 0.0200},
+    "copper_roughness": {"model": "hammerstad", "Rq_um": 1.5},
+    "category": "standard"
+  },
+  "FR-4_HighTg": {
+    "dk": 4.40,
+    "df": 0.0150,
+    "dk_freq_coeff": {"type": "constant", "value": 4.40},
+    "df_freq_model": {"type": "constant", "value": 0.0150},
+    "copper_roughness": {"model": "hammerstad", "Rq_um": 1.5},
+    "category": "standard"
+  },
+  "Rogers_RO4350B": {
+    "dk": 3.66,
+    "df": 0.0037,
+    "dk_freq_coeff": {"type": "constant", "value": 3.66},
+    "df_freq_model": {"type": "constant", "value": 0.0037},
+    "copper_roughness": {"model": "huray", "Rq_um": 0.8, "sphere_radius_um": 0.5},
+    "category": "high_frequency"
+  },
+  "Rogers_RO4003C": {
+    "dk": 3.55,
+    "df": 0.0027,
+    "dk_freq_coeff": {"type": "constant", "value": 3.55},
+    "df_freq_model": {"type": "constant", "value": 0.0027},
+    "copper_roughness": {"model": "huray", "Rq_um": 0.8, "sphere_radius_um": 0.5},
+    "category": "high_frequency"
+  },
+  "Megtron_6": {
+    "dk": 3.70,
+    "df": 0.0020,
+    "dk_freq_coeff": {"type": "constant", "value": 3.70},
+    "df_freq_model": {"type": "constant", "value": 0.0020},
+    "copper_roughness": {"model": "huray", "Rq_um": 0.6, "sphere_radius_um": 0.4},
+    "category": "high_speed"
+  },
+  "Isola_Itera_MW": {
+    "dk": 3.45,
+    "df": 0.0030,
+    "dk_freq_coeff": {"type": "constant", "value": 3.45},
+    "df_freq_model": {"type": "constant", "value": 0.0030},
+    "copper_roughness": {"model": "huray", "Rq_um": 0.8, "sphere_radius_um": 0.5},
+    "category": "high_frequency"
+  },
+  "Teflon_PTFE": {
+    "dk": 2.10,
+    "df": 0.0002,
+    "dk_freq_coeff": {"type": "constant", "value": 2.10},
+    "df_freq_model": {"type": "constant", "value": 0.0002},
+    "copper_roughness": {"model": "hammerstad", "Rq_um": 0.5},
+    "category": "high_frequency"
+  }
+}

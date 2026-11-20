@@ -1,0 +1,13 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+# Tool runtime / agent cognition (not research content)
+.aoci/
+.superpowers/
+.opencode/
+# Secrets (in case regenerated)
+secrets.toml
+.env

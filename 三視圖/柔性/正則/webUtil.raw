@@ -1,0 +1,2 @@
+vim.api.set_keymap('n', ' html', ' py3 rtrvHTML() ', {'noremap':True, 'silent':True}) vim.api.set_keymap('n', ' rst', ' py3 rstHTML() ', {'noremap':True, 'silent':True}) # from os.path import splitext from pathlib import Path from os import system def rtrvHTML(): fname=vim.funcs.expand('%') #:p:h # base, ext=Path(fname) base=Path(fname).stem #, ext cmd=f'htmlParser.py "{fname}">"{base}.raw"' print(cmd) system(cmd) def rstHTML(): fname=vim.funcs.expand('%') #:p:h base=Path(fname).stem #, ext cmd=f'rst2html5.py "{fname}">"{base}.html"' print(cmd) system(cmd)
+

@@ -1,0 +1,202 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+
+\title{Provenance-Grounded Use of 9-Coefficient Thermal Conductivity Fits for Cryogenic Heat-Load Estimation: A Review and Reliability-Aware Workflow}
+\author{Project Review/Integration Draft (~/量傳線)\\Documented: 2026-11-19}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Target journal (requested):} \textit{Cryogenics} (Elsevier). Submission suitability, article type, formatting, APC/open-access options, and policies must be checked against the latest journal guidelines before submission.
+
+\begin{abstract}
+Low-temperature thermal budgeting in cryogenic engineering---including conduction through supports and interconnects in dilution-refrigerator systems---commonly relies on fitted representations of material thermal conductivity $\kappa(T)$, especially 9-coefficient log-log polynomials (c0..c8 / a..i) and source-specific rational/RRR forms for selected materials \cite{nist,marquardt,bradley,simon1992,flynn,raicu2025}. Recent high-density superconducting cabling work illustrates the practical stakes: Smith \textit{et al.} estimated a 5~nW per-trace conductive heat load from 1~K to 100~mK for a 1-ft flexible Nb--47\,wt\% Ti coaxial ribbon cable by combining literature thermal-conductivity values with cable cross sections, and compared this to commercial coaxial and NbTi-on-polyimide flex options \cite{smith2024}. Such nW-scale estimates depend directly on which $\kappa(T)$ data and fits are used, over what ranges they are valid, and how extrapolations are handled.
+
+This draft presents \textbf{Heatload-Distill}, a provenance-grounded review and reliability-aware workflow for using 9-coefficient $\kappa(T)$ fits in cryogenic heat-load estimation. The workflow organizes practice into four traceable steps: (1) literature and material-database provenance, (2) physical/model interpretation of the 9 parameters and heat-load equations, (3) matrix/least-squares solution and numerical conditioning, and (4) polyfit reliability validation. It is anchored to a single source of truth (SSOT, decision D4=A) and same-source artifacts (\texttt{topic-viz} Format F: specification + snapshot + offline HTML/Excel with graceful degradation and error disclosure).
+
+Using \path{docs/9coeff_4step_flow.json} (generated 2026-11-19T10:48:13, \texttt{errors: 0}) and associated artifacts, we review 54 database entries (48 \texttt{log\_polynomial}, 5 \texttt{rational\_copper}, 1 \texttt{runtime\_polyfit}) and 53 fixed-coefficient materials for numeric coefficient--material relations; \texttt{NbTi (Cri/oFlex 3)} is \texttt{runtime\_polyfit} with \texttt{coeffs=null} and excluded from fixed-coefficient numeric relations. Existing validation evidence (synthetic log-log cubic-spline generator, 8th-order \texttt{np.polyfit}, $T\in[2,300]$~K, $N=50$ log-spaced points, perturbation study) shows that in-range integrated conductivity ($\int_{2}^{300}\kappa\,dT$) is comparatively stable under tested perturbations, whereas deep-low-temperature extrapolation (e.g., $\kappa$ at 20~mK) is highly sensitive to perturbations and fitting/process choices and should be treated only as an order-of-magnitude indicator. Evidence also shows strong ill-conditioning of the raw power basis, material-specific structural residual near NbTi $T_c$ under a global 8th-order fit, and a large discrepancy between stored and validation-fit Kapton coefficients (max $|\Delta c|\approx 79.48$). No coefficients are re-fit or invented and no new material-property measurements are claimed.
+\end{abstract}
+
+\noindent\textbf{Keywords:} cryogenics, cryogenic thermal conductivity, 9-coefficient fit, heat-load estimation, dilution refrigerator, provenance, numerical conditioning, polyfit reliability, review.
+
+\section{Introduction}
+\subsection{Cryogenic heat-load estimation and the role of $\kappa(T)$ fits}
+Cryogenic systems for superconducting electronics and quantum technologies impose strict thermal budgets across temperature stages. A common engineering task is to estimate conductive heat flow $Q=\frac{A}{L}\int_{T_c}^{T_h}\kappa(T)\,dT$ for cables, supports, and interconnects, sometimes combined with dissipative terms. For many materials, $\kappa(T)$ is represented by compact fitted forms---most prominently 9-coefficient log-log polynomials and, for selected cases such as OFHC copper, source-specific rational/RRR relations---distributed through cryogenic material databases and prior modeling work \cite{nist,marquardt,bradley,simon1992,flynn,raicu2025}.
+
+The impact of these representations is concrete. Smith \textit{et al.} reported improved 53\,wt\% Nb--47\,wt\% Ti flexible coaxial ribbon cables (FLAX) and computed per-trace heat loads by summing literature $\kappa(T)$ values for constituent materials weighted by cross section; for a 1-ft cable they estimated 5~nW per trace from 1~K to 100~mK (approximately half that of the smallest commercially available superconducting coax in their comparison), while noting material-dependent tradeoffs and assumptions in such calculations (e.g., use of PTFE data to estimate PFA, geometry/material weighting, and extrapolation in $\kappa(T)$ data) \cite{smith2024}. This exemplifies that nW- to $\mu$W-scale design decisions can hinge on coefficient choice, valid temperature range, and extrapolation behavior.
+
+\subsection{Problem: precision without traceability}
+The central difficulty in reuse is often not the availability of coefficients, but the loss of context: where coefficients came from, over which temperature range they are valid, how they were obtained or solved numerically, and when extrapolated values become unreliable. A heat-load number may appear precise while resting on undocumented provenance, out-of-range evaluation, ill-conditioned fitting, or process-dependent coefficients.
+
+\subsection{Aim and scope}
+\textbf{Aim.} To review and integrate a provenance-grounded, reliability-aware workflow---\textbf{Heatload-Distill}---for using 9-coefficient $\kappa(T)$ fits in cryogenic heat-load estimation, based on existing SSOT records and validation artifacts.
+
+\textbf{In scope.} Provenance/database records (SSOT), model forms and parameter interpretation, matrix/least-squares conditioning considerations, reliability-validation results, and implications for heat-load estimation practice, organized as a same-source auditable chain.
+
+\textbf{Out of scope.} New experimental measurements, re-fitting of SSOT fixed coefficients, invention of missing coefficients, promotion of runtime-fitted results to fixed material properties, and claims beyond cited/validated evidence (including any re-computation of third-party cable designs).
+
+\subsection{Contributions}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Provenance-grounded review for cryogenic practice:} a traceable chain spanning source/database, model, numerical solution, and validation boundaries, motivated by cryogenic interconnect heat-load estimation needs \cite{smith2024,raicu2025}.
+\item \textbf{Same-source integration workflow:} specification, snapshot, offline HTML/Excel, and snapshot-driven interactive view aligned with SSOT decisions (D1--D6, D4=A).
+\item \textbf{Evidence-based reliability interpretation:} conditioning, perturbation sensitivity, in-range integral stability, deep-low-temperature extrapolation uncertainty, coefficient/process sensitivity, and material-specific model-structure residuals (NbTi near $T_c$), translated into conservative usage guidance.
+\item \textbf{Target-journal relevance:} a cryogenic engineering methods/review contribution on traceable and reliability-aware use of $\kappa(T)$ fit data for heat-load estimation, not a new material-property dataset.
+\end{itemize}
+
+\section{Provenance and SSOT as the Basis for Heat-Load Estimates}
+\subsection{Why provenance matters in cryogenic interconnect comparisons}
+Heat-load comparisons across cable or interconnect technologies can be sensitive to material-property assumptions. Smith \textit{et al.} computed thermal conductivity/heat-load contributions by combining literature $\kappa(T)$ values with cross-sectional areas, used PTFE values to estimate PFA, and reported extrapolated regions in their comparison while discussing conductor- vs dielectric-dominated regimes \cite{smith2024}. Defensible comparison therefore requires transparent source, range, and extrapolation handling.
+
+\subsection{Source roles (project provenance and verified motivating reference)}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}p{4.1cm}p{6.9cm}p{3.8cm}@{}}
+\toprule
+Source & Role in this review & Notes \\
+\midrule
+Raicu et al. (2025) \cite{raicu2025} & Cryogenic thermal modeling context for microwave high-density signaling & Application context; no new coefficients here \\
+NIST Cryogenics Index \cite{nist} & Primary cryogenic material-property database reference & Upstream properties context \\
+Marquardt et al. (2000) \cite{marquardt} & Cryogenic material properties database (as recorded) & Details limited to project record \\
+Bradley et al. (2006) \cite{bradley} & Database update (as recorded) & Details limited to project record \\
+Simon et al. (1992) \cite{simon1992} & Cu/Cu-alloy cryogenic properties; supports \texttt{rational\_copper} context & NIST Monograph 177 \\
+Flynn \cite{flynn} & Foundational cryogenic engineering/heat-load context (as recorded) & Edition/publisher not fully specified \\
+Smith et al. (2024) \cite{smith2024} & Verified application example of literature-based cryogenic cable heat-load estimation and cross-section comparison & Motivating context only; no re-computation \\
+\bottomrule
+\end{tabular}
+\caption{Source roles. Smith \textit{et al.} is a user-specified, programmatically verified reference (DOI/arXiv metadata).}
+\end{table}
+
+\subsection{SSOT database, coverage, and boundaries}
+SSOT (D4=A): \path{~/.opencode/skills/heatload-coff-nist/scripts/coeff_data.py}, \path{thermal_load.py}. The database contains 54 entries (48 \texttt{log\_polynomial}, 5 \texttt{rational\_copper}, 1 \texttt{runtime\_polyfit}). Fixed-coefficient numeric relations use 53 materials; \texttt{NbTi (Cri/oFlex 3)} is \texttt{runtime\_polyfit} with \texttt{coeffs=null} and excluded. Step 1 artifacts retain all 54 raw rows (material, equation type, range, coefficients, source, notes). Project decisions D1--D6 (B,D,D,A,A,C) preserve legacy assets while adding shared core/pages/same-source artifacts.
+
+\section{Models and Numerical Formulation}
+\subsection{Thermal-conductivity and heat-load models}
+For most materials,
+\begin{equation}
+\log_{10}\kappa(T)=\sum_{n=0}^{8} c_n \left(\log_{10}T\right)^n,
+\end{equation}
+while some OFHC copper entries use source-specific rational/RRR-based forms (\texttt{rational\_copper}) \cite{simon1992,nist,marquardt,bradley}. A common stage-wise conductive heat-load model is
+\begin{equation}
+Q_{solid}=\sum_i \frac{A}{L_i}\int_{T_{c,i}}^{T_{h,i}}\kappa(T)\,dT,
+\end{equation}
+with optional dissipative terms represented in artifacts as $Q_{rf}=\sum_i P_{in}\left(1-10^{-\alpha_i/10}\right)$ when applicable. Out-of-range handling and low-temperature extrapolation (e.g., $k(T)\sim T^\alpha$ below fit range in validation context) must be interpreted conservatively \cite{flynn,raicu2025}.
+
+\subsection{Physical temperature-zone calculation for temperature-zone fitting (stage-wise conduction and length back-calculation)}
+To connect the general stage-wise integral $Q_{solid}$ in Section~3.1 with practical cryogenic interconnect sizing and temperature-zone evaluation (\texttt{溫區擬合}, temperature-zone fitting and stage-wise physical calculation), project derivation notes (\path{docs/溫區擬合_物理模型_來源萃取.md}) decompose the physical calculation into four conditional layers:
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Steady 1D Fourier conduction and stage-wise integral context.} Under steady one-dimensional axial conduction without intermediate thermal anchors, lateral radiative exchange, or distributed internal heat generation along segment $i$ of length $L_i$~$[\mathrm{m}]$ and effective cross-sectional area $A$~$[\mathrm{m}^2]$, the conductive heat load $Q_i$ (or $P_i$)~$[\mathrm{W}]$ across temperature bounds $(T_{c,i}, T_{h,i})$~$[\mathrm{K}]$ is governed by the nonlinear Fourier definite integral:
+\begin{equation}
+Q_i = \frac{A}{L_i}\int_{T_{c,i}}^{T_{h,i}}\kappa(T)\,dT = \frac{A}{L_i}I_i, \qquad I_i = \int_{T_{c,i}}^{T_{h,i}}\kappa(T)\,dT \ \left[\mathrm{W}\cdot\mathrm{m}^{-1}\right].
+\end{equation}
+In project benchmark derivations (\path{~/量傳線/三視圖/柔性/驗證/對標CF3規格電性熱負載物理推導.md} and \path{~/量傳線/溫區擬合/03_熱傳導與熱導率模型/傅立葉導熱定律回推長度.md}), this stage-wise formulation is evaluated against sourced vendor reference stages---such as the $4\text{--}40\,\mathrm{K}$ stage ($\Delta T=36\,\mathrm{K}$, $L=0.4\,\mathrm{m}$, benchmark $<125\,\mu\mathrm{W/ch}$) and the $10\text{--}350\,\mathrm{mK}$ stage ($\Delta T=340\,\mathrm{mK}$, $L=0.2\,\mathrm{m}$, benchmark $\sim 20\,\mathrm{nW/ch}$)---strictly as sourced specification/derivation context rather than new experimental measurements.
+
+\item \textbf{Simplified special cases: constant/average $\kappa$ and Wiedemann--Franz ($\rho=\mathrm{const}$) analytical limit.} Over a narrow temperature interval or for order-of-magnitude scaling, replacing $\kappa(T)$ by its interval average $\kappa_{avg}=\frac{1}{\Delta T}\int_{T_c}^{T_h}\kappa(T)\,dT$ yields the linear approximation $Q \approx \frac{\kappa_{avg}A}{L}\Delta T$ ($\Delta T = T_h - T_c$). For normal-state metals in the low-temperature elastic impurity-scattering regime where electrical resistivity is approximately constant ($\rho(T)\approx \rho_0=\mathrm{const}$, electrical resistance $R=\rho L/A$), combining Fourier conduction with the Wiedemann--Franz law $\kappa_e(T) = L_0 T/\rho$ ($L_0 \approx 2.44\times 10^{-8}\,\mathrm{W\cdot\Omega\cdot K^{-2}}$) gives the closed-form quadratic temperature relation (\path{~/量傳線/溫區擬合/03_熱傳導與熱導率模型/基礎推導熱負載.md}):
+\begin{equation}
+Q = \frac{L_0 A}{2\rho L}\left(T_h^2 - T_c^2\right) = \frac{L_0 T_{avg}\Delta T}{R}, \qquad \kappa_{avg} = \frac{L_0 T_{avg}}{\rho}, \quad T_{avg}=\frac{T_h+T_c}{2}
+\end{equation}
+(with DC Joule heating $I^2 R$ additive when bias current $I$ is present, while microwave attenuation dissipation connects to $Q_{rf}$ in Section~3.1). This quadratic formula is strictly conditional: it does \textbf{not} apply to amorphous dielectric substrates such as polyimide/Kapton (dominated by phonon boundary and two-level-system scattering), nor to superconductors below their critical temperature (e.g., NbTi below $T_c \approx 9.2\text{--}9.8\,\mathrm{K}$, where Cooper-pair condensation suppresses electronic thermal conduction exponentially and invalidates the Wiedemann--Franz relation), nor to higher-temperature inelastic scattering regimes where $\rho(T)$ varies strongly (\path{~/量傳線/溫區擬合/04_溫區長度回推與約束/推導溫區公式.md}; piecewise power-law expressions in that note serve only as qualitative physical mechanism illustrations, whereas all formal calculations remain bound to the SSOT D4=A database in Section~2.3).
+
+\item \textbf{Ratio of thermal integrals and area-normalized length back-calculation.} Because multi-layer flexible cables contain composite conductor/dielectric cross sections whose effective area $A$ is difficult to decompose precisely from external datasheets alone, the derivation in \path{~/量傳線/溫區擬合/03_熱傳導與熱導率模型/傅立葉導熱定律回推長度.md} normalizes a target temperature zone (``$\mathrm{image}$'') against a reference zone (``$\mathrm{ref}$'') of \textbf{identical cross-sectional geometry and material stack-up} ($A_{image}=A_{ref}$):
+\begin{equation}
+I_{ref}=\int_{T_{c,ref}}^{T_{h,ref}}\kappa(T)\,dT, \qquad I_{image}=\int_{T_{c,image}}^{T_{h,image}}\kappa(T)\,dT,
+\end{equation}
+\begin{equation}
+\frac{P_{image}}{P_{ref}} = \frac{L_{ref}}{L}\left(\frac{I_{image}}{I_{ref}}\right) \implies L = L_{ref}\left(\frac{P_{ref}}{P_{image}}\right)\left(\frac{I_{image}}{I_{ref}}\right),
+\end{equation}
+where $I_{image}/I_{ref}$ is the temperature-zone thermal-integral ratio (illustrated in the source note by expanding a $40\,\mathrm{K}\to 4\,\mathrm{K}$ reference stage with $L_{ref}=40\,\mathrm{cm}, P_{ref}=125\,\mu\mathrm{W}$ to a $50\,\mathrm{K}\to 4\,\mathrm{K}$ target stage with an example integral ratio $I_{image}/I_{ref}=1.48$). This cancellation of $A$ fails whenever comparing heterogeneous stack-ups (e.g., a 7-layer $300\,\mu\mathrm{m}$ GSG flex versus an 11-layer $144.1\,\mu\mathrm{m}$ FPC with plated through-holes), in which case explicit layer-wise area ratios $\sum_k A_k\int\kappa_k(T)\,dT$ must be retained.
+
+\item \textbf{Ultra-low-temperature profile assumptions, qubit decoherence threshold, and safe-length limitations.} In the millikelvin stage ($10\text{--}350\,\mathrm{mK}$), exploratory notes (\path{~/量傳線/溫區擬合/02_極低溫溫區與熱負載/crioFlex3回推量子比特溫區長度.md} and \path{~/量傳線/溫區擬合/04_溫區長度回推與約束/最大安全長度.md}) couple cable temperature profiles to a transmon thermal-excitation threshold. For a transmon with $f_{01}=5.5\,\mathrm{GHz}$ ($\alpha=-250\,\mathrm{MHz}$), requiring excited-state thermal occupancy $P_{|1\rangle}=\exp(-hf_{01}/k_B T)<1\%$ (or $n_{th}=[\exp(hf_{01}/k_B T)-1]^{-1}<0.01$) yields a critical temperature $T_{crit}\approx 57.6\,\mathrm{mK}$. Under a \textbf{simplified constant-$\kappa$, unanchored linear temperature profile} $T(x)=T_c+(T_h-T_c)(x/L)$ from $T_c=10\,\mathrm{mK}$ to $T_h=350\,\mathrm{mK}$, the cold-end region below $T_{crit}$ spans $x_{safe}=L(T_{crit}-T_c)/(T_h-T_c)\approx 2.8\,\mathrm{cm}$ for $L=20\,\mathrm{cm}$, and requiring a $x_{req}=5\,\mathrm{cm}$ safe zone back-calculates to $L_{new}=x_{req}(T_h-T_c)/(T_{crit}-T_c)\approx 35.7\,\mathrm{cm}$ (whereas an alternative exploratory assumption with distributed self-heating $\Delta T\propto L^2$ gives $L_{\max}\approx 7.5\,\mathrm{cm}$). These back-calculated lengths are highly sensitive to boundary assumptions: because $\kappa(T)$ varies strongly in the mK regime, steady flux conservation $\kappa(T)\frac{dT}{dx}=\mathrm{const}$ produces a nonlinear temperature profile, practical dilution refrigerators enforce stage thermal anchoring and microwave filtering/attenuation rather than relying on an unanchored span, and SSOT polynomial fits (typically valid at $\ge 1\text{--}4\,\mathrm{K}$, with \texttt{NbTi (Cri/oFlex 3)} having \texttt{coeffs=null} as \texttt{runtime\_polyfit}) cannot be extrapolated to $10\text{--}350\,\mathrm{mK}$ as validated material properties.
+\end{enumerate}
+
+\subsection{Least-squares/matrix view of 9-parameter fitting}
+With $x_i=\log_{10}T_i$ and $y_i=\log_{10}\kappa(T_i)$, the polynomial model can be written as $y_i \approx \sum_{j=0}^{8} c_j x_i^j$ ($X_{i,j}=x_i^j$, $y\approx Xc$) and solved by least squares (e.g., normal equations $X^T X c = X^T y$ or numerically more stable equivalents). Coefficients admit practical interpretation ($c_0$ scale, $c_1$ dominant trend, higher-order terms curvature/detail), but in a high-order monomial basis they are correlated and can be sensitive to noise, scaling, range, and implementation details; they should not be treated as independent microscopic constants.
+
+\subsection{Numerical conditioning}
+Raw monomial/Vandermonde-like bases for this fit are strongly ill-conditioned. Centering/scaling can improve conditioning, but reported condition numbers depend on implementation, definition, source data, temperature range, and scaling convention. Conditioning must therefore be reported and interpreted in context before drawing conclusions from coefficient values or derived extrapolations.
+
+\section{Heatload-Distill Workflow and Same-Source Artifacts}
+\subsection{Artifact contract}
+Specification \path{docs/9coeff_4step_視覺化規格.md}; same-source snapshot \path{docs/9coeff_4step_flow.json} (\texttt{errors: 0}); offline \path{docs/9coeff_4step_demo.html}, \path{docs/9coeff_4step_demo.xlsx}; snapshot-driven Streamlit demo \path{scripts/9coeff_4step_streamlit_demo.py} and wrapper \path{熱負載/pages/32_9coeff_4step_demo.py}; generator \path{scripts/9coeff_4step_viz.py}.
+
+\subsection{Four-step traceability chain}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Literature/material database:} 54 raw rows, provenance anchors, SSOT paths; \texttt{NbTi (Cri/oFlex 3)} marked \texttt{runtime\_polyfit}, \texttt{coeffs=null}.
+\item \textbf{Physical/model interpretation:} $\kappa(T)$ forms, $Q_{solid}/Q_{rf}$, range/extrapolation rules.
+\item \textbf{Matrix solution and conditioning:} least-squares/design-matrix view, conditioning/scaling caveats, 53-material fixed-coefficient relations.
+\item \textbf{Polyfit reliability validation:} \path{docs/polyfit_可靠度驗證.md/json} and snapshot Step 4 summary to bound credibility, not to claim new properties.
+\end{enumerate}
+
+\subsection{Non-destructive integration context}
+Following decisions D1--D5, shared core modules and pages were added/refactored while preserving existing assets and aligning calculations/displays with SSOT. Offline artifacts are inspectable; interactive/visual outputs may degrade or remain unverified when dependencies are unavailable.
+
+\section{Reliability Evidence Review}
+\subsection{Validation setup (reported)}
+Data generation: \texttt{scipy.CubicSpline(log-log)} (\texttt{HAVE\_SCIPY=True}); fit: $\log_{10}(k)=\sum_{n=0}^{8} c_n (\log_{10}T)^n$ via \texttt{np.polyfit(x,y,8)}; sampling: $T\in[2,300]$~K, $N=50$, log-spaced; low-$T$ extrapolation in implementation: $k(T)=T^\alpha$ for $T<T_{min}$; perturbations: noise $\in\{0,1,2,5\}\%$, seeds $=6$ (24 runs/material).
+
+\subsection{Conditioning and baseline results}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lrrp{4.6cm}@{}}
+\toprule
+Metric & Kapton (baseline) & NbTi (baseline) & Interpretation \\
+\midrule
+$R^2$ & 0.999976 & 0.990847 & Good in-range fit; lower for NbTi \\
+RMSE (log10) & 0.003461 & 0.121327 & Larger residuals for NbTi \\
+$\alpha_{extrap}$ & -10.2796 & -9.2815 & Implementation-defined exponent \\
+$k(20\,\mathrm{mK})$ [W/m/K] & $2.916\times10^{17}$ & $5.875\times10^{15}$ & Deep extrapolation, indicator only \\
+$\int_{2}^{300}\kappa\,dT$ [W/m] & 28.907 & 2226.46 & Comparatively stable in-range integral \\
+Tc-region max $|\mathrm{resid}_{\log10}|$ & --- & 0.492 ($\sim$7.5--12.5 K) & Structural residual near transition \\
+\bottomrule
+\end{tabular}
+\caption{Baseline validation metrics (noise=1\%, seed=42), from reported artifacts.}
+\end{table}
+
+Conditioning (reported): $\mathrm{cond}(V)_{raw}=1.309\times10^7$, $\mathrm{cond}(V^T V)_{raw}=1.713\times10^{14}$, $\mathrm{cond}(V_{centered,scaled})=5.256\times10^4$.
+
+\subsection{Perturbation sensitivity and provenance checks}
+Kapton (24 runs): $k(20\,\mathrm{mK})$ in $[1.904\times10^{17},\,3.968\times10^{17}]$ W/m/K, $\int_{2}^{300}\kappa\,dT$ in $[28.737,\,29.497]$ W/m. NbTi (24 runs): $k(20\,\mathrm{mK})$ in $[3.837\times10^{15},\,7.995\times10^{15}]$ W/m/K, $\int_{2}^{300}\kappa\,dT$ in $[2209.92,\,2271.26]$ W/m with persistent Tc-region residual. Within the tested protocol, in-range integrals were comparatively stable, whereas deep-low-temperature extrapolated $k(20\,\mathrm{mK})$ varied by roughly a factor of $\sim$2 in reported runs but lies far outside the fit range and is process-sensitive; it should be treated only as a conservative order-of-magnitude indicator. Findings do not generalize without further validation.
+
+Stored vs validation-fit Kapton coefficients differ substantially (max $|\Delta c|\approx 79.48$ in snapshot summary), reinforcing provenance requirements. NbTi remains \texttt{runtime\_polyfit} with \texttt{coeffs=null}.
+
+\section{Discussion and Practical Guidance}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Start from provenance and range:} as illustrated by literature-based cable heat-load calculations \cite{smith2024}, defensible estimates require explicit source, material mapping, and valid temperature intervals.
+\item \textbf{Separate stable from sensitive outputs:} prefer in-range integrals supported by validation; treat deep-low-temperature extrapolation (e.g., $k$ at 20~mK) conservatively.
+\item \textbf{Report numerical/fit context:} high-order monomial fits are ill-conditioned and context-dependent.
+\item \textbf{Acknowledge material/model limits:} NbTi residuals near $T_c$ indicate structural limits of a global 8th-order polynomial (documented, not replaced here).
+\item \textbf{Preserve auditable artifacts:} disclose same-source outputs and environment-dependent degradation.
+\end{enumerate}
+
+\section{Limitations}
+Review/integration of existing evidence only (no new measurements or re-fitting). Coverage and conclusions are constrained by SSOT/upstream sources and the reported validation protocol. Interactive/visual runtime verification is environment-dependent. The Smith \textit{et al.} example is motivating context only (no re-computation). Journal suitability, article type, and submission requirements must be confirmed against current \textit{Cryogenics} guidelines.
+
+\section{Conclusion}
+Heatload-Distill consolidates provenance, modeling, numerical-solution context, and reliability evidence for 9-coefficient cryogenic $\kappa(T)$ heat-load estimation into a four-step, same-source, auditable workflow. In-range integrated quantities can be comparatively stable under tested conditions, while deep-low-temperature extrapolations and high-order coefficients remain sensitive and model-limited in specific regimes (e.g., NbTi near $T_c$). Trustworthy heat-load estimates should be based on traceable provenance, explicit validity ranges, and disclosed uncertainty.
+
+\section*{Availability}
+Artifacts: \path{docs/9coeff_4step_視覺化規格.md}, \path{docs/9coeff_4step_flow.json}, \path{docs/9coeff_4step_demo.html/.xlsx}; reliability: \path{docs/polyfit_可靠度驗證.md}, \path{docs/polyfit_可靠度驗證.json}; integration: \path{docs/NIST9熱負載整合說明.md}, \path{docs/NIST9_視覺化規格.md}; SSOT/provenance: \path{~/.opencode/skills/heatload-coff-nist/scripts/\{coeff_data,thermal_load\}.py}, \path{references/citations.md}; scripts: \path{scripts/9coeff_4step_viz.py}, \path{scripts/9coeff_4step_streamlit_demo.py}, \path{scripts/validate_polyfit_reliability.py}; journal notes: \path{docs/heatload-distill_期刊候選.md}.
+
+\begin{thebibliography}{9}
+\bibitem{raicu2025} N. Raicu et al., ``Cryogenic thermal modeling of microwave high density signaling,'' \textit{EPJ Quantum Technology}, 12:124, 2025. doi:10.1140/epjqt/s40507-025-00427-1. Dataset: doi:10.5281/zenodo.15238913.
+\bibitem{nist} NIST Cryogenics Index of Material Properties. \url{https://trc.nist.gov/cryogenics/materials/materialproperties.htm}.
+\bibitem{marquardt} E. D. Marquardt, J. P. Le, R. Radebaugh, ``Cryogenic Material Properties Database,'' 11th International Cryocooler Conference, 2000. (As recorded in project citations.)
+\bibitem{bradley} P. E. Bradley et al., ``Cryogenic Material Properties Database, Update 2006,'' ICEC 21, 2006. (As recorded in project citations.)
+\bibitem{simon1992} N. J. Simon, E. S. Drexler, R. P. Reed, \textit{Properties of Copper and Copper Alloys at Cryogenic Temperatures}, NIST Monograph 177, NIST, 1992.
+\bibitem{flynn} T. M. Flynn, \textit{Cryogenic Engineering}. (Edition/publisher details not fully specified in project citations.)
+\bibitem{smith2024} J. P. Smith, B. A. Mazin, A. Boaventura, K. J. Thompson, M. Daal, ``Improved Flexible Coaxial Ribbon Cable for High-Density Superconducting Arrays,'' \textit{IEEE Transactions on Applied Superconductivity}, 34(2), 1--6, 2024. doi:10.1109/TASC.2024.3350516. arXiv:2306.13574.
+\end{thebibliography}
+
+\end{document}

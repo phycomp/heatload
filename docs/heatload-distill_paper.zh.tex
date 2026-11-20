@@ -1,0 +1,204 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Sans CJK TC}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+
+\title{基於溯源之 9 係數低溫熱導率擬合於熱負載估算的應用：回顧與可靠度感知工作流\\[4pt]\large （與英文稿章節、邏輯、內文、圖表/表格高度一致之中文版）}
+\author{專案回顧/整合稿 (~/量傳線)\\文件日期：2026-11-19}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{目標期刊（請求）：}\textit{Cryogenics} (Elsevier)。投稿適配性、文章型態、格式、APC/開放取用選項與政策須於投稿前依期刊當期指南查核。
+
+\begin{abstract}
+低溫工程中的熱預算評估——包括稀釋冷凍機系統中支撐件與互連線的傳導熱——通常仰賴材料熱導率 $\kappa(T)$ 的擬合表示式，尤其是 9 係數 log-log 多項式（c0..c8 / a..i）以及針對特定材料之來源特定有理式/RRR 形式 \cite{nist,marquardt,bradley,simon1992,flynn,raicu2025}。近期高密度超導佈線研究凸顯了其實務影響：Smith \textit{et al.} 結合文獻熱導率值與電纜截面，估算 1 英呎長柔性 Nb--47\,wt\% Ti 同軸帶狀電纜由 1~K 至 100~mK 每條跡線之傳導熱負載為 5~nW，並與商用同軸與 NbTi-on-polyimide 撓性線選項進行比較 \cite{smith2024}。此類 nW 等級估算直接取決於所使用的 $\kappa(T)$ 資料與擬合、其有效溫度範圍，以及外推處理方式。
+
+本文提出 \textbf{Heatload-Distill}：一套用於低溫熱負載估算中 9 係數 $\kappa(T)$ 擬合之、以溯源為基礎且具可靠度感知的回顧與工作流程。該流程將實務組織為四個可追溯步驟：(1) 文獻與材料資料庫溯源、(2) 9 參數與熱負載方程式之物理/模型詮釋、(3) 矩陣/最小平方法求解與數值條件性、(4) polyfit 可靠度驗證。其以單一真實來源（SSOT，決策 D4=A）與同源產物（\texttt{topic-viz} Format F：規格 + 快照 + 離線 HTML/Excel，具降級與錯誤揭露）為依據。
+
+依據 \path{docs/9coeff_4step_flow.json}（generated 2026-11-19T10:48:13, \texttt{errors: 0}）與相關產物，我們回顧 54 筆資料庫條目（48 \texttt{log\_polynomial}、5 \texttt{rational\_copper}、1 \texttt{runtime\_polyfit}）以及 53 筆固定係數材料用於數值係數--材料關係；\texttt{NbTi (Cri/oFlex 3)} 為 \texttt{runtime\_polyfit} 且 \texttt{coeffs=null}，排除於固定係數數值關係之外。既有驗證證據（合成 log-log 三次樣條產生器、8 階 \texttt{np.polyfit}、$T\in[2,300]$~K、$N=50$ 對數間距點、擾動研究）顯示，擬合區間內積分熱導率（$\int_{2}^{300}\kappa\,dT$）在測試擾動下相對穩定，而深低溫外推（例如 $\kappa$ 在 20~mK）對擾動及擬合/流程選擇高度敏感，僅應視為量級指標。證據亦顯示原始冪次基底之強病態、全域 8 階擬合下 NbTi $T_c$ 附近之材料特定結構殘差，以及儲存係數與驗證擬合 Kapton 係數間之巨大差異（max $|\Delta c|\approx 79.48$）。本文不重擬合或發明係數，亦不宣稱新的材料物性量測。
+\end{abstract}
+
+\noindent\textbf{關鍵詞：} 低溫工程、低溫熱導率、9 係數擬合、熱負載估算、稀釋冷凍機、溯源、數值條件性、polyfit 可靠度、回顧
+
+\section{緒論}
+\subsection{低溫熱負載估算與 $\kappa(T)$ 擬合的角色}
+超導電子與量子技術所用低溫系統對各溫階熱預算有嚴格限制。常見工程任務為估算電纜、支撐件與互連線之傳導熱流 $Q=\frac{A}{L}\int_{T_c}^{T_h}\kappa(T)\,dT$，有時結合耗散項。對多數材料而言，$\kappa(T)$ 以緊湊擬合形式表示——最常見為 9 係數 log-log 多項式，以及針對 OFHC 銅等特定案例之來源特定有理式/RRR 關係——並透過低溫材料資料庫與既有建模研究提供 \cite{nist,marquardt,bradley,simon1992,flynn,raicu2025}。
+
+此類表示式的影響具體可見。Smith \textit{et al.} 報導改良之 53\,wt\% Nb--47\,wt\% Ti 柔性同軸帶狀電纜（FLAX），並以組成材料之文獻 $\kappa(T)$ 值依截面加權求和計算每條跡線熱負載；對 1 英呎電纜，其估算由 1~K 至 100~mK 每條跡線為 5~nW（約為其比較中最小商用超導同軸線之一半），同時亦指出此類計算中的材料相依權衡與假設（例如以 PTFE 資料估算 PFA、幾何/材料加權、以及 $\kappa(T)$ 資料外推）\cite{smith2024}。此例說明：nW 至 $\mu$W 等級之設計決策可能取決於係數選擇、有效溫度範圍與外推行為。
+
+\subsection{問題：缺乏可追溯性的精確度}
+重用時的核心困難往往不在於係數是否可得，而在於脈絡流失：係數來源為何、在哪個溫度範圍有效、如何取得或以數值求解，以及外推值何時變得不可靠。熱負載數值可能看似精確，卻建立在未記錄之溯源、超出範圍評估、病態擬合或流程相依係數之上。
+
+\subsection{目的與範圍}
+\textbf{目的。} 以既有 SSOT 紀錄與驗證產物為基礎，回顧並整合一套用於低溫熱負載估算中 9 係數 $\kappa(T)$ 擬合之、以溯源為基礎且具可靠度感知的工作流程——\textbf{Heatload-Distill}。
+
+\textbf{範圍內。} 溯源/資料庫紀錄（SSOT）、模型形式與參數詮釋、矩陣/最小平方法條件性考量、可靠度驗證結果，以及其對熱負載估算實務之意涵，並組織為同源可稽核鏈。
+
+\textbf{範圍外。} 新的實驗量測、SSOT 固定係數之重擬合、缺漏係數之發明、將 runtime 擬合結果提升為固定材料性質，以及超出已引用/已驗證證據之主張（包括對第三方電纜設計之任何重算）。
+
+\subsection{貢獻}
+\begin{itemize}[leftmargin=*]
+\item \textbf{面向低溫實務之溯源回顧：} 跨越來源/資料庫、模型、數值求解與驗證邊界之可追溯鏈，並以低溫互連熱負載估算需求為動機 \cite{smith2024,raicu2025}。
+\item \textbf{同源整合工作流程：} 規格、快照、離線 HTML/Excel 與快照驅動互動檢視，與 SSOT 決策（D1--D6, D4=A）對齊。
+\item \textbf{基於證據之可靠度詮釋：} 條件性、擾動敏感度、擬合區間積分穩定性、深低溫外推不確定性、係數/流程敏感性，以及材料特定模型結構殘差（NbTi 近 $T_c$），並轉化為保守使用指引。
+\item \textbf{目標期刊關聯性：} 關注 $\kappa(T)$ 擬合資料於熱負載估算之可追溯且具可靠度感知的使用，而非新的材料物性資料集。
+\end{itemize}
+
+\section{溯源與 SSOT：熱負載估算的基礎}
+\subsection{溯源在低溫互連比較中的重要性}
+跨電纜或互連技術之熱負載比較可能對材料物性假設敏感。Smith \textit{et al.} 明確地以文獻 $\kappa(T)$ 值結合截面積計算熱導率/熱負載貢獻，使用 PTFE 值估算 PFA，並在比較中報告外推區域，同時討論依材料系統而異的導體主導與介電主導區間 \cite{smith2024}。可辯護比較因此需要透明的來源、範圍與外推處理。
+
+\subsection{來源角色（依專案溯源紀錄與已驗證動機參考）}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}p{4.1cm}p{6.9cm}p{3.8cm}@{}}
+\toprule
+來源 & 在本回顧中的角色 & 備註 \\
+\midrule
+Raicu et al. (2025) \cite{raicu2025} & 微波高密度訊號之低溫熱建模脈絡 & 應用脈絡；此處非新係數 \\
+NIST Cryogenics Index \cite{nist} & 主要低溫材料物性資料庫參考 & 上游物性脈絡 \\
+Marquardt et al. (2000) \cite{marquardt} & 低溫材料物性資料庫（依紀錄） & 細節限於專案紀錄 \\
+Bradley et al. (2006) \cite{bradley} & 資料庫更新（依紀錄） & 細節限於專案紀錄 \\
+Simon et al. (1992) \cite{simon1992} & Cu/Cu 合金低溫性質；支援 \texttt{rational\_copper} 脈絡 & NIST Monograph 177 \\
+Flynn \cite{flynn} & 基礎低溫工程/熱負載脈絡（依紀錄） & 版本/出版社未完全指定 \\
+Smith et al. (2024) \cite{smith2024} & 基於文獻之低溫電纜熱負載估算與截面比較之已驗證範例 & 僅動機脈絡；未重算 \\
+\bottomrule
+\end{tabular}
+\caption{來源角色。Smith \textit{et al.} 為使用者指定且可程式化驗證之參考（DOI/arXiv metadata）。}
+\end{table}
+
+\subsection{SSOT 資料庫、涵蓋範圍與邊界}
+SSOT (D4=A)：\path{~/.opencode/skills/heatload-coff-nist/scripts/coeff_data.py}, \path{thermal_load.py}。資料庫含 54 筆條目（48 \texttt{log\_polynomial}、5 \texttt{rational\_copper}、1 \texttt{runtime\_polyfit}）。固定係數數值關係使用 53 筆材料；\texttt{NbTi (Cri/oFlex 3)} 為 \texttt{runtime\_polyfit} 且 \texttt{coeffs=null} 並排除。Step 1 產物保留全部 54 筆原始列（材料、方程類型、範圍、係數、來源、備註）。專案決策 D1--D6（B,D,D,A,A,C）在保留 legacy 資產同時新增共用核心/頁面/同源產物。
+
+\section{模型與數值公式化}
+\subsection{熱導率與熱負載模型}
+對多數材料，
+\begin{equation}
+\log_{10}\kappa(T)=\sum_{n=0}^{8} c_n \left(\log_{10}T\right)^n,
+\end{equation}
+而部分 OFHC 銅條目使用來源特定有理式/RRR 形式（\texttt{rational\_copper}）\cite{simon1992,nist,marquardt,bradley}。常用分溫階傳導熱負載模型為
+\begin{equation}
+Q_{solid}=\sum_i \frac{A}{L_i}\int_{T_{c,i}}^{T_{h,i}}\kappa(T)\,dT,
+\end{equation}
+並在適用時以選用耗散項 $Q_{rf}=\sum_i P_{in}\left(1-10^{-\alpha_i/10}\right)$ 表示。超出範圍處理與低溫外推（例如驗證脈絡中擬合範圍以下 $k(T)\sim T^\alpha$）必須保守詮釋 \cite{flynn,raicu2025}。
+
+\subsection{「溫區擬合」之物理溫區計算（分溫階導熱與長度回推）}
+為將第~3.1 節之通用分溫階積分 $Q_{solid}$ 與實際低溫互連尺寸設計及溫區評估（「\texttt{溫區擬合}」，temperature-zone fitting 與分溫階物理計算）銜接，專案推導筆記（\path{docs/溫區擬合_物理模型_來源萃取.md}）將物理計算拆解為四個具條件邊界之層次：
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{一維穩態傅立葉導熱與分溫階積分脈絡。} 在沿長度為 $L_i$~$[\mathrm{m}]$、有效導熱截面積為 $A$~$[\mathrm{m}^2]$ 之線段 $i$ 呈一維穩態軸向熱傳導，且區間內無中間熱錨分流、無側向輻射熱交換、亦無分散式內部熱源的假設下，跨越溫度邊界 $(T_{c,i}, T_{h,i})$~$[\mathrm{K}]$ 之傳導熱負載 $Q_i$（或 $P_i$）~$[\mathrm{W}]$ 由非線性傅立葉定積分決定：
+\begin{equation}
+Q_i = \frac{A}{L_i}\int_{T_{c,i}}^{T_{h,i}}\kappa(T)\,dT = \frac{A}{L_i}I_i, \qquad I_i = \int_{T_{c,i}}^{T_{h,i}}\kappa(T)\,dT \ \left[\mathrm{W}\cdot\mathrm{m}^{-1}\right].
+\end{equation}
+在專案對標推導（\path{~/量傳線/三視圖/柔性/驗證/對標CF3規格電性熱負載物理推導.md} 與 \path{~/量傳線/溫區擬合/03_熱傳導與熱導率模型/傅立葉導熱定律回推長度.md}）中，此分溫階公式係對照來源文獻所載之廠商參考溫階進行評估——例如 $4\text{--}40\,\mathrm{K}$ 溫階（$\Delta T=36\,\mathrm{K}$，$L=0.4\,\mathrm{m}$，對標基準 $<125\,\mu\mathrm{W/ch}$）與 $10\text{--}350\,\mathrm{mK}$ 溫階（$\Delta T=340\,\mathrm{mK}$，$L=0.2\,\mathrm{m}$，對標基準 $\sim 20\,\mathrm{nW/ch}$）——嚴格作為具來源依據之規格/推導脈絡，而非新的實驗量測結果。
+
+\item \textbf{簡化特例：常數/平均 $\kappa$ 與 Wiedemann--Franz（$\rho=\mathrm{const}$）解析極限。} 在窄溫度區間或作數量級尺度估算時，以區間平均值 $\kappa_{avg}=\frac{1}{\Delta T}\int_{T_c}^{T_h}\kappa(T)\,dT$ 取代 $\kappa(T)$ 可得線性近似 $Q \approx \frac{\kappa_{avg}A}{L}\Delta T$（$\Delta T = T_h - T_c$）。對於處於低溫彈性雜質散射主導區、電阻率近似常數（$\rho(T)\approx \rho_0=\mathrm{const}$，電阻 $R=\rho L/A$）之正常態金屬，將傅立葉導熱結合 Wiedemann--Franz 定律 $\kappa_e(T) = L_0 T/\rho$（$L_0 \approx 2.44\times 10^{-8}\,\mathrm{W\cdot\Omega\cdot K^{-2}}$），可積分得出封閉形式之溫度平方差關係（\path{~/量傳線/溫區擬合/03_熱傳導與熱導率模型/基礎推導熱負載.md}）：
+\begin{equation}
+Q = \frac{L_0 A}{2\rho L}\left(T_h^2 - T_c^2\right) = \frac{L_0 T_{avg}\Delta T}{R}, \qquad \kappa_{avg} = \frac{L_0 T_{avg}}{\rho}, \quad T_{avg}=\frac{T_h+T_c}{2}
+\end{equation}
+（當存在偏置電流 $I$ 時可疊加直流焦耳熱 $I^2 R$，而微波衰減耗散則銜接第~3.1 節之 $Q_{rf}$）。此平方差公式具嚴格條件限制：其\textbf{不適用}於非晶介電質基材（如 polyimide/Kapton，由聲子邊界散射與雙能階系統散射主導），\textbf{不適用}於臨界溫度以下之超導體（例如 NbTi 在 $T_c \approx 9.2\text{--}9.8\,\mathrm{K}$ 以下，庫柏對凝聚使電子熱導呈指數衰減並使 Wiedemann--Franz 關係失效），亦\textbf{不適用}於 $\rho(T)$ 隨溫度劇烈變化之較高溫非彈性散射區間（\path{~/量傳線/溫區擬合/04_溫區長度回推與約束/推導溫區公式.md}；該筆記中之分段冪次式僅作為定性物理機制示意，所有正式計算仍受第~2.3 節 SSOT D4=A 資料庫約束）。
+
+\item \textbf{溫區熱導積分比與面積正規化之長度回推。} 由於多層柔性排線包含複合導體/介電質截面，其有效導熱截面積 $A$ 難以僅由外部規格書精確拆解，\path{~/量傳線/溫區擬合/03_熱傳導與熱導率模型/傅立葉導熱定律回推長度.md} 中之推導在\textbf{橫截面幾何與材料層疊結構完全相同}（$A_{image}=A_{ref}$）的前提下，將目標溫區（``$\mathrm{image}$''）對基準溫區（``$\mathrm{ref}$''）進行正規化相除：
+\begin{equation}
+I_{ref}=\int_{T_{c,ref}}^{T_{h,ref}}\kappa(T)\,dT, \qquad I_{image}=\int_{T_{c,image}}^{T_{h,image}}\kappa(T)\,dT,
+\end{equation}
+\begin{equation}
+\frac{P_{image}}{P_{ref}} = \frac{L_{ref}}{L}\left(\frac{I_{image}}{I_{ref}}\right) \implies L = L_{ref}\left(\frac{P_{ref}}{P_{image}}\right)\left(\frac{I_{image}}{I_{ref}}\right),
+\end{equation}
+其中 $I_{image}/I_{ref}$ 為溫區熱導積分比（來源筆記中以基準溫階 $40\,\mathrm{K}\to 4\,\mathrm{K}$、$L_{ref}=40\,\mathrm{cm}, P_{ref}=125\,\mu\mathrm{W}$ 擴展至目標溫階 $50\,\mathrm{K}\to 4\,\mathrm{K}$、示例積分比 $I_{image}/I_{ref}=1.48$ 作說明）。一旦比較異構層疊（例如 7 層 $300\,\mu\mathrm{m}$ GSG 柔性線對比含導通孔之 11 層 $144.1\,\mu\mathrm{m}$ FPC），此截面積 $A$ 之消去即不再成立，必須顯式保留分層面積比 $\sum_k A_k\int\kappa_k(T)\,dT$。
+
+\item \textbf{極低溫溫度分布假設、量子比特退相干閾值與安全長度限制。} 在毫克耳文溫階（$10\text{--}350\,\mathrm{mK}$），探索性推導筆記（\path{~/量傳線/溫區擬合/02_極低溫溫區與熱負載/crioFlex3回推量子比特溫區長度.md} 與 \path{~/量傳線/溫區擬合/04_溫區長度回推與約束/最大安全長度.md}）將排線溫度分布與 transmon 熱激發閾值耦合。對於 $f_{01}=5.5\,\mathrm{GHz}$（$\alpha=-250\,\mathrm{MHz}$）之 transmon，要求激發態熱佔據率 $P_{|1\rangle}=\exp(-hf_{01}/k_B T)<1\%$（或 $n_{th}=[\exp(hf_{01}/k_B T)-1]^{-1}<0.01$）可得出臨界溫度 $T_{crit}\approx 57.6\,\mathrm{mK}$。在\textbf{簡化之常數 $\kappa$、無中途熱錨線性溫度分布} $T(x)=T_c+(T_h-T_c)(x/L)$（由 $T_c=10\,\mathrm{mK}$ 至 $T_h=350\,\mathrm{mK}$）假設下，對 $L=20\,\mathrm{cm}$ 而言，冷端低於 $T_{crit}$ 之區域長度為 $x_{safe}=L(T_{crit}-T_c)/(T_h-T_c)\approx 2.8\,\mathrm{cm}$；若要求 $x_{req}=5\,\mathrm{cm}$ 之安全區，則回推總長為 $L_{new}=x_{req}(T_h-T_c)/(T_{crit}-T_c)\approx 35.7\,\mathrm{cm}$（而另一含分散式自發熱 $\Delta T\propto L^2$ 之探索假設則給出 $L_{\max}\approx 7.5\,\mathrm{cm}$）。此類回推長度對邊界假設高度敏感：因 $\kappa(T)$ 在 mK 區間隨溫度強烈變化，穩態熱通量守恆 $\kappa(T)\frac{dT}{dx}=\mathrm{const}$ 會產生非線性溫度分布；實際稀釋冷凍機配置亦仰賴分級熱錨與微波濾波/衰減器，而非單靠未錨定之懸空線段；且 SSOT 多項式擬合（通常有效範圍為 $\ge 1\text{--}4\,\mathrm{K}$，而 \texttt{NbTi (Cri/oFlex 3)} 為 \texttt{runtime\_polyfit} 且 \texttt{coeffs=null}）不可外推至 $10\text{--}350\,\mathrm{mK}$ 並當作已驗證之材料性質。
+\end{enumerate}
+
+\subsection{9 參數擬合之最小平方法/矩陣觀點}
+令 $x_i=\log_{10}T_i$ 且 $y_i=\log_{10}\kappa(T_i)$，多項式模型可寫為 $y_i \approx \sum_{j=0}^{8} c_j x_i^j$（$X_{i,j}=x_i^j$，$y\approx Xc$）並以最小平方法求解（例如正規方程 $X^T X c = X^T y$ 或數值上更穩定之等價方法）。係數具實務詮釋（$c_0$ 尺度、$c_1$ 主趨勢、高階項曲率/細節），但在高階單項式基底中彼此相關，且可能對雜訊、縮放、範圍與實作細節敏感；不應視為獨立微觀常數。
+
+\subsection{數值條件性}
+此擬合之原始單項式/類 Vandermonde 基底具強病態。中心化/縮放可改善條件性，但所報告之條件數取決於實作、定義、來源資料、溫度範圍與縮放慣例。因此，在由係數值或衍生外推得出結論前，必須在脈絡中報告並詮釋條件性。
+
+\section{Heatload-Distill 工作流程與同源產物}
+\subsection{產物契約}
+規格 \path{docs/9coeff_4step_視覺化規格.md}；同源快照 \path{docs/9coeff_4step_flow.json}（\texttt{errors: 0}）；離線 \path{docs/9coeff_4step_demo.html}、\path{docs/9coeff_4step_demo.xlsx}；快照驅動 Streamlit demo \path{scripts/9coeff_4step_streamlit_demo.py} 與 wrapper \path{熱負載/pages/32_9coeff_4step_demo.py}；產生器 \path{scripts/9coeff_4step_viz.py}。
+
+\subsection{四步驟可追溯鏈}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{文獻/材料資料庫：} 54 筆原始列、溯源錨點、SSOT 路徑；\texttt{NbTi (Cri/oFlex 3)} 標示 \texttt{runtime\_polyfit}、\texttt{coeffs=null}。
+\item \textbf{物理/模型詮釋：} $\kappa(T)$ 形式、$Q_{solid}/Q_{rf}$、範圍/外推規則。
+\item \textbf{矩陣求解與條件性：} 最小平方法/設計矩陣觀點、條件性/縮放注意事項、53 筆材料固定係數關係。
+\item \textbf{Polyfit 可靠度驗證：} \path{docs/polyfit_可靠度驗證.md/json} 與快照 Step 4 摘要，以界定可信度而非宣稱新性質。
+\end{enumerate}
+
+\subsection{非破壞性整合脈絡}
+依決策 D1--D5，在保留既有資產同時新增/重構共用核心模組與頁面，並使計算/顯示與 SSOT 對齊。離線產物可檢視；當相依不可用時互動/視覺輸出可能降級或未驗證。
+
+\section{可靠度證據回顧}
+\subsection{驗證設定（依報告）}
+資料產生：\texttt{scipy.CubicSpline(log-log)}（\texttt{HAVE\_SCIPY=True}）；擬合：$\log_{10}(k)=\sum_{n=0}^{8} c_n (\log_{10}T)^n$ via \texttt{np.polyfit(x,y,8)}；取樣：$T\in[2,300]$~K、$N=50$、對數間距；實作中低溫外推：$k(T)=T^\alpha$ 當 $T<T_{min}$；擾動：noise $\in\{0,1,2,5\}\%$、seeds $=6$（每材料 24 次）。
+
+\subsection{條件性與基準結果}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lrrp{4.6cm}@{}}
+\toprule
+指標 & Kapton（基準） & NbTi（基準） & 詮釋 \\
+\midrule
+$R^2$ & 0.999976 & 0.990847 & 擬合區間內擬合良好；NbTi 較低 \\
+RMSE (log10) & 0.003461 & 0.121327 & NbTi 殘差較大 \\
+$\alpha_{extrap}$ & -10.2796 & -9.2815 & 實作定義外推指數 \\
+$k(20\,\mathrm{mK})$ [W/m/K] & $2.916\times10^{17}$ & $5.875\times10^{15}$ & 深度外推，僅指標 \\
+$\int_{2}^{300}\kappa\,dT$ [W/m] & 28.907 & 2226.46 & 擬合區間積分相對穩定 \\
+Tc 區域 max $|\mathrm{resid}_{\log10}|$ & --- & 0.492 ($\sim$7.5--12.5 K) & 相變附近結構殘差 \\
+\bottomrule
+\end{tabular}
+\caption{基準驗證指標（noise=1\%，seed=42），依報告產物。}
+\end{table}
+
+條件性（依報告）：$\mathrm{cond}(V)_{raw}=1.309\times10^7$、$\mathrm{cond}(V^T V)_{raw}=1.713\times10^{14}$、$\mathrm{cond}(V_{centered,scaled})=5.256\times10^4$。
+
+\subsection{擾動敏感度與溯源檢查}
+Kapton（24 次）：$k(20\,\mathrm{mK})$ 於 $[1.904\times10^{17},\,3.968\times10^{17}]$ W/m/K、$\int_{2}^{300}\kappa\,dT$ 於 $[28.737,\,29.497]$ W/m。NbTi（24 次）：$k(20\,\mathrm{mK})$ 於 $[3.837\times10^{15},\,7.995\times10^{15}]$ W/m/K、$\int_{2}^{300}\kappa\,dT$ 於 $[2209.92,\,2271.26]$ W/m 且 Tc 區結構殘差持續。在測試協議內，擬合區間積分相對穩定，而深低溫外推 $k(20\,\mathrm{mK})$ 在報告執行中約變動 $\sim$2 倍但遠在擬合範圍外且具流程敏感性；僅應視為保守量級指標。結果未經進一步驗證不得推廣。
+
+儲存與驗證擬合 Kapton 係數差異顯著（快照摘要 max $|\Delta c|\approx 79.48$），強化溯源要求。NbTi 仍為 \texttt{runtime\_polyfit} 且 \texttt{coeffs=null}。
+
+\section{討論與實務指引}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{從溯源與範圍出發：} 如文獻式電纜熱負載計算所示 \cite{smith2024}，可辯護估算需明確來源、材料對應與有效溫度區間。
+\item \textbf{區分穩定與敏感輸出：} 在有驗證支持時優先使用擬合區間積分；保守看待深低溫外推（如 $k$ 於 20~mK）。
+\item \textbf{報告數值/擬合脈絡：} 高階單項式擬合具病態且脈絡相依。
+\item \textbf{承認材料/模型限制：} NbTi 於 $T_c$ 附近殘差顯示全域 8 階多項式之結構限制（本文記錄，不替換模型）。
+\item \textbf{保留可稽核產物：} 揭露同源輸出與環境相依降級。
+\end{enumerate}
+
+\section{限制}
+僅為既有證據之回顧/整合（無新量測或重擬合）。涵蓋與結論受 SSOT/上游來源及報告驗證協議限制。互動/視覺執行期驗證具環境相依性。Smith \textit{et al.} 範例僅動機脈絡（未重算）。期刊適配性、文章型態與投稿要求須依 \textit{Cryogenics} 當期指南確認。
+
+\section{結論}
+Heatload-Distill 將 9 係數低溫 $\kappa(T)$ 熱負載估算之溯源、建模、數值求解脈絡與可靠度證據整合為四步驟、同源、可稽核工作流程。在測試條件下，擬合區間積分量可相對穩定，而深低溫外推與高階係數對擾動、流程選擇與數值條件性敏感，且在特定區間（如 NbTi 近 $T_c$）存在材料特定結構殘差。可信的熱負載估算應建立於可追溯溯源、明確有效範圍與不確定性揭露。
+
+\section*{可得性}
+產物：\path{docs/9coeff_4step_視覺化規格.md}、\path{docs/9coeff_4step_flow.json}、\path{docs/9coeff_4step_demo.html/.xlsx}；可靠度：\path{docs/polyfit_可靠度驗證.md}、\path{docs/polyfit_可靠度驗證.json}；整合：\path{docs/NIST9熱負載整合說明.md}、\path{docs/NIST9_視覺化規格.md}；SSOT/溯源：\path{~/.opencode/skills/heatload-coff-nist/scripts/\{coeff_data,thermal_load\}.py}、\path{references/citations.md}；腳本：\path{scripts/9coeff_4step_viz.py}、\path{scripts/9coeff_4step_streamlit_demo.py}、\path{scripts/validate_polyfit_reliability.py}；期刊說明：\path{docs/heatload-distill_期刊候選.md}。
+
+\begin{thebibliography}{9}
+\bibitem{raicu2025} N. Raicu et al., ``Cryogenic thermal modeling of microwave high density signaling,'' \textit{EPJ Quantum Technology}, 12:124, 2025. doi:10.1140/epjqt/s40507-025-00427-1. Dataset: doi:10.5281/zenodo.15238913.
+\bibitem{nist} NIST Cryogenics Index of Material Properties. \url{https://trc.nist.gov/cryogenics/materials/materialproperties.htm}.
+\bibitem{marquardt} E. D. Marquardt, J. P. Le, R. Radebaugh, ``Cryogenic Material Properties Database,'' 11th International Cryocooler Conference, 2000.（依專案引用紀錄。）
+\bibitem{bradley} P. E. Bradley et al., ``Cryogenic Material Properties Database, Update 2006,'' ICEC 21, 2006.（依專案引用紀錄。）
+\bibitem{simon1992} N. J. Simon, E. S. Drexler, R. P. Reed, \textit{Properties of Copper and Copper Alloys at Cryogenic Temperatures}, NIST Monograph 177, NIST, 1992.
+\bibitem{flynn} T. M. Flynn, \textit{Cryogenic Engineering}.（版本/出版社細節於專案引用中未完全指定。）
+\bibitem{smith2024} J. P. Smith, B. A. Mazin, A. Boaventura, K. J. Thompson, M. Daal, ``Improved Flexible Coaxial Ribbon Cable for High-Density Superconducting Arrays,'' \textit{IEEE Transactions on Applied Superconductivity}, 34(2), 1--6, 2024. doi:10.1109/TASC.2024.3350516. arXiv:2306.13574.
+\end{thebibliography}
+
+\end{document}

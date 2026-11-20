@@ -1,0 +1,29 @@
+## 建議配置（config.arc.yaml）
+
+project:
+  name: "cryogenic-qubit-readout"
+
+research:
+  topic: "Cryogenic quantum transmission line optimization for high-density multi-qubit readout with flexible substrate crosstalk suppression"
+  domains: ["quantum_physics", "superconducting_circuits", "microwave_engineering"]
+
+experiment:
+  mode: "docker"
+  time_budget_sec: 1800  # 30 分鐘（FEM 模擬需要較長時間）
+  max_iterations: 5
+  docker:
+    image: "comsol/multiphysics:latest"
+    gpu_enabled: true
+    memory_limit_mb: 16384  # 16GB 用於網格計算
+
+# 啟用 MetaClaw 累積材料資料庫
+metaclaw_bridge:
+  enabled: true
+  lesson_to_skill:
+    min_severity: "info"
+    max_skills_per_run: 5
+
+# 啟用 OpenCode Beast Mode 處理複雜多物理場模型
+opencode:
+  enabled: true
+  complexity_threshold: 0.7  # 高閾值（量子傳輸線屬於複雜問題）

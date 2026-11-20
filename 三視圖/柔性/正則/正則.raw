@@ -1,0 +1,67 @@
+qstring刪除最後一個字符_vim技巧：刪除行首、行末的空白字符，刪除空白行 weixin_39736650
+QString 使用正則操作的接口實現_ qstring 正則替換資源
+- 1.remove方法remove方法用于移除字符串中符合正則表達式 rx的匹配項.該方法有兩個重載版本:* `qstring &remove(const qregexp &rx)`* `qstring &remove(const qregularexpression &re)`返回移除後的字符串引用
+.replace方法 replace方法用于將字符串中符合正則表達式 rx的匹配項替換爲 after字符串.該方法有兩個重載... 立即下載 /* MD / 富文本中的 .toc（含博客園搬家等嵌套結構）；.toc-box 在側欄，不受影響 */ #content_views .toc, /* 編輯器常在目錄前後插入空 p（:empty 仍占 20px），一并去掉避免頂空隙 */ #content_views.markdown_views 
+> p:empty:has(+ .toc), #content_views.markdown_views 
+> .toc + p:empty, /* 富文本舊版目錄標記 */ #content_views.htmledit_views #main-toc, #content_views.htmledit_views #hr-toc, #content_views.htmledit_views p[id*="-toc"] { display: none !important; } /* 目錄去掉後，緊跟的首個標題不再多出一塊上邊距 */ #content_views.markdown_views 
+> .toc + h1, #content_views.markdown_views 
+> .toc + h2, #content_views.markdown_views 
+> .toc + h3, #content_views.markdown_views 
+> .toc + h4, #content_views.markdown_views 
+> .toc + p:empty + h1, #content_views.markdown_views 
+> .toc + p:empty + h2, #content_views.markdown_views 
+> .toc + p:empty + h3, #content_views.markdown_views 
+> .toc + p:empty + h4 { margin-top: 0 !important; }
+
+本篇文章介紹 vim 的一些使用技巧： 刪除行首、行末的空白字符(空格和Tab字符) 刪除只有一個換行符的空行 刪除包含空白字符的空白行，但不刪除只有一個換行符的空行 刪除包含空白字符的空白行和只有一個換行符的空行 刪除行首、行末的空白字符(空格和Tab字符)
+
+在 vim 中， 可以使用 :%s/^s+// 命令刪除行首的所有空白字符 。這裏說的 “空白字符” 指的是空格和Tab字符，不包括換行符。對該命令的各個參數具體說明如下： :%s :s 是替換命令，可以替換字符串，其基本格式是 :s/from/to/ ，把 "from" 字符串替換成 "to" 字符串，可以用正則表達式來匹配特定模式。該命令默認對光標所在行生效，而 :%s 表示對整個文件都進行替換。 ^
+表示匹配行首，即從行首開始匹配。對這個例子來說，只匹配行首的空白字符，不會匹配單詞中間的空白字符和行末的空白字符。 s
+表示匹配一個空白字符，也就是空格或Tab字符。 +
+表示匹配一個或連續多個跟在它前面的上一個字符，其實是正則表達式 + 元字符的轉義寫法。例如， a+ 表示匹配 "a", "aa", "aaaaaa" 等等， s+ 就是匹配一個或多個空白字符，至少要有一個空白字符。 /^s+//
+表示要匹配的內容是行首開頭的一個或多個空白字符，最後的兩個 // 中間內容爲空，即替換後的內容爲空，相當于去掉了行首的所有空白字符。
+
+也可以使用 :%s/^s*// 命令來刪除行首的所有空白字符， * 表示匹配零個或連續多個跟在它前面的上一個字符。這個命令會匹配到行首沒有空格的情況，由于替換後的內容是空，沒有影響。
+
+注意 ：如果寫成 :%s/^s// 的形式，只會刪除行首的第一個空格，而不能刪除多個空格。 寫成 :%s/^+s// 的形式也是只能刪除行首的第一個空格。
+
+類似的，可以用 :%s/s+$// 命令來刪除行末的所有空白字符，$ 表示匹配行末 。也可以寫成 :%s/s*$// 的形式。
+
+使用 :help :s 命令查看該命令的幫助說明，部分關鍵內容說明如下：
+
+:[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+For each line in [range] replace a match of {pattern} with {string}.
+When [range] and [count] are omitted, replace in the current line only.
+
+使用 :help s 命令查看 s 的含義如下：
+
+s whitespace character: and
+
+使用 :help + 命令查看 + 的含義如下：
+
++ Matches 1 or more of the preceding atom, as many as possible.
+
+使用 :help /* 命令查看在模式匹配中 * 的含義如下：
+
+* (use * when 'magic' is not set)
+Matches 0 or more of the preceding atom, as many as possible.
+
+空白行指的是看起來沒有內容的行，但實際上可能會有空格、Tab字符，或者行末的換行符。針對下面幾種情況，需要用不同的命令來刪除空白行： 刪除只有一個換行符的空行 刪除包含空白字符的空白行，但不刪除只有一個換行符的空行 刪除包含空白字符的空白行和只有一個換行符的空行 刪除只有一個換行符的空行
+
+在 vim 中，可以使用 :%g/^$/d 命令來刪除只有一個換行符的空行。這裏的 ^ 表示匹配行首， $ 表示匹配行末，在行首和行末之間沒有任何字符，也就是空行。嚴格來說，這裏說的“行末”指的是最後一個換行符前面的一個字符，不包括換行符自身。“空行” 實際上還是包含有一個換行符。
+
+假設文件中有如下的內容： abcdefghijklmnopqrst AI寫代碼
+
+那麼執行 :%g/^$/d 命令後的內容如下： abcdefghijklmnopqrst AI寫代碼
+
+可以看到，中間的空行都被刪除了。 刪除包含空白字符的空白行，但不刪除只有一個換行符的空行
+
+有一些空白行看起來沒有內容，但可能會包含空格、Tab字符等空白字符，這些行用 :%g/^$/d 命令無法刪除， ^$ 匹配不到包含空白字符的情況。
+
+可以用 :%g/^s+$/d 命令來刪除這些空白行，但不刪除只有一個換行符的空行。
+
+這裏的 s 表示匹配一個空白字符， + 表示匹配一個或連續多個跟在它前面的上一個字符， s+ 至少匹配一個空白字符，換行符不屬于空白字符，所以不匹配只有一個換行符的情況。 刪除包含空白字符的空白行和只有一個換行符的空行
+
+可以使用 :%g/^s*$/d 命令來同時刪除包含空白字符的空白行和只有一個換行符的空行。
+
+這裏的 * 表示匹配零個或連續多個跟在它前面的上一個字符。對 ^s*$ 模式來說，匹配零個空白字符的情況，就相當于 ^$ 模式，也就是匹配只有一個換行符的空行，所以這個命令可以刪除只有一個換行符的空行。

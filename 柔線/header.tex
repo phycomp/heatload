@@ -1,0 +1,5 @@
+\usepackage{newunicodechar}
+
+% 直接指定字體檔案名稱，並開啟 Harfbuzz 引擎
+\newfontfamily{\emojifont}{NotoColorEmoji.ttf}[Path=/usr/share/texmf-dist/fonts/truetype/google/noto-emoji/, Renderer=Harfbuzz]
+\newunicodechar{⭐}{{\emojifont ⭐}}

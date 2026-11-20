@@ -1,0 +1,175 @@
+The user wants me to proceed with the suggested priority order: ① DOC-003 次期補完（🟠/🔴 誤差界推導）→ ② Polar 模板擴充（HDI 10L、core build）→ ③ Speedstack 場解器比對，把 Flex-Rigid 從「模型提案」升級.
+Let me plan the steps (max 25):
+① DOC-003 次期補完:
+Lagrange series inversion error bounds for II.4/II.5 (asymmetric/broadside correction factor inversion)
+Kantorovich convergence proof for CPW Newton
+Thickness correction joint solution (Δw(t) coupled with inversion)
+Update the library: add functions for these (e.g., series inversion for χ-dependent cases with error bounds, cpw with Kantorovich check, thickness-corrected microstrip inverse)
+Numerically validate the error bounds
+Update DOC-003 sections II.4/II.5/II.8 + remove "次期待辦" items, add new appendix
+② Polar 模板擴充: add HDI 10L (3 press cycle) template + 6L core build template to library; update assign() logic for blind via areas (🔴 degraded); extend app.py with template selector (already dynamic); update DOC-003 §III.
+③ Flex-Rigid upgrade: "Speedstack 場解器比對" — I don't have Speedstack software. What can I do? I can implement a 2D numerical field solver (finite element / method of moments) in Python to serve as the "field solver" reference — actually a good honest approach: build a simple 2D capacitance solver (FEM with square mesh or boundary element) for the flex-rigid junction discontinuity, compute the effective dielectric transition, and upgrade the flex-rigid model from "proposal" to "field-solver validated". That's a legitimate engineering approach: our own quasi-static 2D FEM as the independent third party (since Speedstack itself isn't accessible here). I should be honest: I cannot run actual Speedstack software; instead I implement an independent 2D FEM reference solver and note that final calibration against real Speedstack remains.
+Plan concretely:
+Step 1 (ipython):
+Add to library:
+a) lagrange_inversion_chi — series inversion error bound for II.4/II.5: Actually the correction-factor method is exact (χ ⊥ w), so where's the series inversion? The 🟠 pending item was: Lagrange inversion for cases where χ depends on w. Hmm, in our II.4/II.5, χ doesn't depend on w. But for completeness: provide rigorous justification — the "series inversion" was listed as alternative. Better: derive error bound of the closed-form inverse: residual is exactly zero algebraically; the error enters via validity domain of forward formula. Provide formal theorem: inversion exact given forward model; bound on propagated forward-model error: δw ≈ (∂w/∂Z0)δZ0 + ... Provide sensitivity-based error bounds. Also Lagrange inversion demo: for diff microstrip where κ depends on d only — also exact. OK for 🟠 the honest upgrade: prove χ⊥w makes inversion exact, and give propagated-error bounds via implicit function theorem. Also implement thickness-correction joint solve: microstrip with Wheeler Δw(t): w_eff = w + Δw(w,t) — solve coupled via fixed-point/Newton: microstrip_w_thickness(z0,h,t,er) solving implicit equation. Validate.
+b) cpw_kantorovich — compute Kantorovich condition check: bound F', F'' on interval, verify 2·M·L... Actually Kantorovich: if |F'(x0)| ≤ B... condition M·B²·L/2... Let me just implement: compute max |F''| over bracket, check the standard sufficient condition h = M|f(x0)/f'(x0)| ≤ 1/2 with q = h... Simpler: implement verified-bracket bisection-Newton (safe: guarantee convergence by bracketing), which gives a proof of existence & uniqueness via monotonicity + sign change. That's rigorous and useful. Provide function cpw_solve_s_proven returning certificate: monotonicity check on grid + bisection to machine precision then Newton polish; uniqueness certificate.
+Numerical validation of all new items; save results.
+Step 2 (ipython): extend TEMPLATES with "6L_core_build" and "10L_HDI_3press"; update Stackup.assign for HDI blind-via warning; re-run verification; update DOC-003 Part III + appendix; update app (templates list is dynamic from TEMPLATES so app auto-picks up; but ensure assign works with new templates; maybe add per-layer h dicts).
+Step 3 (ipython): build 2D FEM capacitance solver for flex-rigid junction:
+Model: stripline-like geometry with dielectric transitioning from FR4 (εr=4.2) region to PI (εr=3.3) region; compute Z0 in each region and the junction effective length / first-order step ΔZ.
+Implement simple 2D Laplace solver on structured grid with SOR for capacitance per unit length between trace and planes, with mixed dielectrics (harmonic... actually FEM with element-wise permittivity). Then Z0 = sqrt(L/C), L from magnetic analogy (all non-magnetic: L = μ0ε0/C_air). So compute C with dielectric and C_air (all εr=1) → Z0 = 1/(c·sqrt(C·C_air))... standard: Z0 = sqrt(L/C), L = μ0 ε0 / C_air (for TEM with only dielectric change). So Z0 = sqrt(μ0ε0/(C_air·C_diel))·... let me just compute.
+Grid: maybe 200×200 SOR, trace in center, ground planes top/bottom. FR4 region: full domain εr=4.2 except PI region on part. Compute Z0_FR4 and Z0_PI sections, and junction: simulate a long domain half FR4 half PI, compute C per length on each half; junction excess capacitance small. Deliverables: numbers + validation against II.2 closed form in uniform regions (cross-check FEM vs analytic: target <2%?).
+Upgrade DOC-003 §III.4 flex-rigid to "field-solver validated (internal 2D FEM reference v1)", update status header, appendix C with FEM results table.
+Be honest: internal FEM is the third party here; Speedstack cross-check still pending manual step.
+Also update the DOC status from "首期" to "次期 complete" and update app.py? app.py auto includes new templates. Maybe minor update to app caption.
+Number of ipython calls: ~4-5. Fine.
+Let me be careful with the FEM implementation — keep it modest (grid ~ 240×160, SOR with mixed permittivity via element permittivity averaging). Convergence check by grid refinement (two grids, compare).
+Compute geometry: stripline: planes at y=0 and y=b (b=0.4mm), trace width w=0.143mm centered, thickness 0. Domain x ∈ [0, 4mm], y ∈ [0, b]. Dielectric: εr(x) = 4.2 for x < 2mm, 3.3 for x ≥ 2mm. Solve Laplace with trace at V=1, planes at 0. Capacitance per unit length C = ε0·Σ εr_e ∇V... energy: C = 2·W/V², W = (1/2)Σ ε0 εr_e |E|² dA. Use cell-centered potential with SOR; E at cell faces; energy via face permittivity average. Then Z0 = sqrt(μ0 ε0) / sqrt(C_diel · C_air)? Standard formula: L = μ0·(C_air/ε0)? No: For TEM, L·C = με and L = μ0·C_air/ε0 where C_air is capacitance with εr=1 everywhere. So Z0 = sqrt(L/C_diel) = sqrt(μ0 C_air/(ε0 C_diel)). Yes.
+Cross-check uniform FR4 vs II.2 analytic (w=0.143, h=0.2, b=0.4, t=0, er=4.2 → ~50Ω IPC). FEM should give ~50±2 (IPC formula itself approximate vs exact conformal ~48-52). Fine — the point is the junction ΔZ estimate.
+Junction analysis: fit C(x) per unit length in each region away from junction; at junction there's fringing excess capacitance C_junction (integral of C(x)−C_far over x near junction). Then effective impedance step and equivalent excess length L_ex = C_junction/C_far. Report ΔZ/Z0 ≈ half the dielectric contrast: (4.2−3.3)/(2·4.2) ≈ 10.7%? Our DOC-003 proposal said ΔZ ≈ Z0(ε1−ε2)/(2ε1). Validate: Z0_FR4 vs Z0_PI ratio from FEM: sqrt ratio ~ (4.2/3.3)^0.5 ≈ 1.128 → ~12.8% step. Compare with first-order formula 10.7%. Report both, mark validated/updated.
+Now also ②: templates:
+"6L_core_build": from Polar image: L1/L6 single-sided cores, structure: core (L1-L2), pp1080×2, core(L3-L4), pp1080×2, core(L5-L6)? From image: layers 1-6: core(L1), pp1080, pp1080, core(L2? )... The image shows: LPI mask, FR4 Core, PrePreg 1080, PrePreg 1080, FR4 Core, PrePreg 1080, PrePreg 1080, FR4 Core, LPI mask. Total 1267µm. So: L1 on core1 top, L2 core1 bottom; L3 core2 top... Signal layers 1,3,4,6; planes 2,5. h for L1 microstrip: outer layer of core build → trace over plane L2 with core thickness between (h = core_um). Copper: cores single-sided → outer 35µm? Core build outers typically 1oz+ plating. Set copper 35µm outer, 35µm inner. h_microstrip for core build = core thickness (~ say 400µm → but total 1267 = 3 cores + 4 pp1080(~70) = 280 → cores = (1267−280)/3 = 329µm. So core ≈ 329µm. h_L1 = 329 (trace directly on core above plane L2? In core build, L1 and L2 are the two sides of core 1 — L1 signal, L2 plane: h = core 329µm). Stripline L3/L4: between planes L2 and L5: separation = pp1080×2 + core2 = 140+329 = 469 → h=234.5.
+"10L_HDI_3press": total 1520µm; structure from image: press cycle stacking. Simplify: outer micro-via layers L1/L2 with thin pp (laser via), core stack. I'll define signal layers [1,2,4,5,7,8,9? ...] Keep pragmatic: signals 1,3,5,6,8,10? Let me just define: planes 3,7? Simpler: I'll define plausible: n=10, signals [1,2,4,5,8,9], planes [3,6,7,10]? Hmm—HDI typical: L1-L2 microvia, L2-L3... For our library purpose: signals 1,2,4,5,8,9; planes 3,6,7,10... eh, make planes [3, 6, 7, 10]? Let me choose: plane layers [3,6,7,10] weird. Typical 10L HDI 3+N+3? The image "10 layer 3 press cycle HDI": press cycle 1 core center with L5/L6? I'll define: planes [2,9] and inner planes [5,6]? Keep simple and documented as placeholder: signal_layers=[1,2,4,5,7,8,9,10]? Too messy.
+Simplify honestly: define 10L_HDI with planes [2,5,6,9], signals [1,3,4,7,8,10]. Blind via: L1→L2 (pp ~57µm laser), assign warns. h values: L1: 57µm (blind via region → warning flag), L3: between L2 and L5... I'll set explicit h dicts and mark as placeholder pending real .sci file. That's acceptable and honest — DOC-003 notes parameters are editable placeholders calibrated to drawing totals.
+assign() upgrade: add blind_via_layers info: if layer is in microvia pair, return warning "盲孔區禁用閉式逆解，僅供參考" in result dict; app shows warning.
+Implementation: modify TEMPLATES + Stackup.assign (add warning key). Use library edit via append/replace — simplest: rewrite the whole library file with additions (regenerate full file with new content). Safer: append new code + monkey-patch? Cleaner to regenerate full file. I'll write a patch script: read file, replace TEMPLATES block and assign method... risky with string replace. I'll just rewrite the entire library file fresh with all additions incorporated (I have the full source from before; extend it).
+Also add new functions:
+microstrip_w_thickness(z0,h,t,er): joint Wheeler thickness + IPC inverse via fixed-point: iterate: w_eff from inverse; w = w_eff − Δw(w)... Wheeler's Δw depends on w: Δw = t/π[ln(4πw/t)+1] for w/h≥1/2π. Solve fixed point: w_{n+1} = w_inv_target_computed_with(w_eff = w_n + Δw(w_n))? Actually forward: Z0 = A ln(B/(0.8 w_eff + t))? IPC forward uses w directly (0.8w+t includes t separately...). Hmm — IPC formula already includes t in the log argument as (0.8w+t), which is its thickness handling. So joint thickness solve isn't needed for IPC family — the "次期待辦 (3) 厚度修正項 Δw(t) 與反解的聯立" applies to the DOC-002 Hammerstad family where w_eff = w + Δw(w,t) and forward uses w_eff. So implement microstrip_hj_w(z0,h,t,er): Newton on w with forward using w_eff(w). Validate vs DOC-002 HJ forward.
+cpw_solve_s_proven(...): certificate via monotonicity + bisection + Newton polish; returns dict with certificate fields.
+Error-bound function for 🟠: inversion_error_bound(section, ...) computing ∂w/∂Z0 etc. Or simpler: functions returning sensitivity dict + a theorem note. Implement propagated_error(section, dZ0, dh, der, dw, **params)? Keep: sensitivity(section, **params) returning dict of partials for microstrip/stripline/asymmetric/broadside/diff — closed forms from DOC-003 §III.3 extended. Provide for asymmetric/broadside ∂w/∂χ term. Numeric via complex step or central diff for generality? For rigor use analytic where easy; generic central-diff fine but the doc claims closed forms for microstrip family — provide analytic for microstrip & stripline, numeric for others. Hmm keep scope: analytic sensitivity for microstrip/stripline (as in §III.3) — already documented. For this round, key deliverable: (a) exactness proof machinery + error bound propagation via implicit function theorem implemented as inverse_error_bound, (b) proven CPW solve, (c) HJ thickness joint solve, (d) Lagrange inversion demo with bound for a genuinely w-dependent correction (e.g., diff microstrip κ depends on d not w — exact; CPW q depends on s — Newton covered). For Lagrange: demonstrate on ko(w) inversion? Series inversion of tanh composition messy. Alternative honest approach: implement general series_inversion(f, x0, order) symbolic? No sympy guarantee... check sympy availability — likely available. Could use sympy for Lagrange inversion demo of a simple case: e.g., invert f(x) = ln(B/(0.8x+t))·χ with χ(w)-dependence synthetic? That's contrived.
+Better: reframe 🟠 completion as: formal exactness theorem (χ ⊥ w ⇒ inversion exact) + remainder bound when χ has weak w-dependence: for diff stripline conformal, the "correction factor" framing: write Z(w) = Z_strip(w)·κ(w) where κ genuinely depends on w → the correction-factor method introduces relative error ≈ (w/κ)dκ/dw · (residual). Implement correction_factor_residual(w, s, b, er) computing actual residual if one pretended κ ⊥ w, quantifying why 🔴 needs Newton. That's a meaningful, honest "error bound" deliverable: it bounds the error of the 🟠-style shortcut, justifying the 🔴 classification.
+So deliverable ① items:
+Theorem (doc): χ⊥w exact inversion; implicit-function error propagation bound δw ≤ δZ/|F'| implemented as inverse_error_bound(...).
+Lagrange inversion: use sympy to demonstrate series reversion for the 🟠 correction factors? I'll include a sympy-based lagrange_inversion_demo() for the log-family: invert y = A·ln(B/(0.8w+t)) as series in... it's exactly invertible, so demo on the genuinely-transcendental ko(w): series-expand ko around w0, revert, give Z(w) series + radius estimate. With sympy series + reversion; bound via next-order term. Implement diff_stripline_series_inverse(zd_target, s, b, er, order=3): compute series inversion numerically via polynomial fit? Simpler: use the analytic derivatives: compute F(w) derivatives numerically at expansion point via finite differences of increasing order... This is getting heavy.
+Time/step budget: keep it tractable. For Lagrange inversion, do it with sympy symbolically on ko(w) = tanh(aw)/tanh(a(w+s)): invert series numerically: choose w0, compute derivatives via sympy diff (symbolic, exact), build Taylor series of F, revert with series command. sympy series and revert? sympy has Series.revert? There's sympy.series... f.series(x, x0, n) and inversion via revert in sympy.polys? There's sympy.series.fourier... Actually sympy has rs_revert for ring series, and series invert via solve. Easiest: compute Taylor coefficients numerically with complex-step-free high-order finite differences? Error-prone.
+Alternative pragmatic: skip actual Lagrange machinery, and instead deliver the error-bound via implicit function theorem + bisection certificate, and document why: "Lagrange inversion unnecessary for 🟠 (exact χ⊥w); for 🔴 we use certified Newton instead" — that closes the TODO item with a justified methodological decision rather than producing a contrived series. This is defensible and honest: the TODO said "完整級數展開留待次期" — the resolution: series inversion was superseded by exact factorization (🟠) and certified iteration (🔴). Document this decision. That's clean engineering judgment.
+But the user asked to "完成實作" of items ①②③. Item ① was "🟠/🔴 誤差界推導". So deliver:
+Exactness theorem + implicit-function error bound implementation (inverse_error_bound) for 🟢🟡🟠
+Certified Newton for CPW & conformal (monotonicity + bisection + uniqueness certificate)
+Quantified justification of 🔴 classification (correction_factor_residual)
+Thickness joint solve for HJ family (microstrip_hj_w) — closes TODO (3)
+Update DOC-003 accordingly (replace 待辦 with 完成/方法決議)
+③: internal 2D FEM + junction numbers + upgrade Flex-Rigid section to "FEM-v1 validated".
+OK. Total ipython calls plan:
+Call 1: extend library (rewrite full file) + quick smoke.
+Call 2: run certification/FEM preps? FEM is big — do FEM in its own call (call 3) with refinement check.
+Call 3: FEM flex-rigid + stripline validation.
+Call 4: verification suite re-run + update DOC-003 (append new sections, update status) — need to edit existing DOC-003: read, string-replace sections. I'll regenerate the changed parts via targeted replacements:
+Status header line
+§II.8 待辦 block → 完成記錄
+Add new §II.10 (誤差界與收斂證明)
+§III.4 Flex-Rigid → upgraded with FEM results
+Appendix A add new rows? verification additions.
+Also update app.py caption? Minor; maybe add sensitivity display... keep app unchanged except templates auto-load. Actually app reads TEMPLATES dynamically — new templates appear automatically. Blind via warning display: app table shows note column? The assign returns 'warning' key — app ignores extra keys. Fine; skip app edit? Better add warning column quickly in rewrite... I'll patch app.py minimally via replace (one snippet) to show warning.
+Let me now write the extended library. I'll rewrite the whole file (I have the previous content; append new functions before the "統一求解器" or at end + new templates + patched assign).
+Actually simpler: append new code at end of file (new functions + new TEMPLATES entries + Stackup.assign patch via subclass? no—just redefine assign method on class (monkey patch style) or better: define new method name assign2? Ugly. Cleaner to rewrite whole file. I'll rewrite fully.
+Given message length constraints, I'll be efficient. Let me draft the new library content — mostly same as before plus:
+New functions:
+Python
+# ---- 次期補完：誤差界與收斂證明 ----
+def sensitivity_ipc(section, **params):  # analytic partials for log-family
+    ...
+def inverse_error_bound(section, dZ=0.0, dh=0.0, der=0.0, dt=0.0, **params):
+    """隱函數定理誤差傳播界：δw ≤ |∂w/∂Z|δZ + Σ|∂w/∂c|δc（對數族閉式偏導）"""
+    # for microstrip family: w = (B e^{-Z/A} - t)/0.8
+    # ∂w/∂Z = -(B/0.8A) e^{-Z/A} = -(w + t/0.8)/A
+    ...
+def correction_factor_residual(w, s, b, er):
+    """量化「假設 κ⊥w」的誤差：|F(w) − Z_strip(w)·κ(w_fit)|/F(w)"""
+def cpw_solve_s_proven(z0_target, w, h, er, t=0.0, grid=2000):
+    """證明級求解：網格單調性檢查 → 二分法存在性 → 牛頓拋光 → 唯一性證書"""
+def diff_stripline_conformal_w_proven(zdiff_target, s, b, er):
+    same pattern
+def microstrip_hj_w(z0, h, t=0.0, er=4.2, tol=1e-12):
+    """DOC-002 HJ 族＋Wheeler 厚度修正聯立反解（閉式初值＋牛頓）"""
+For proven solves: monotone check on log-spaced grid over w ∈ [1e-6, w_max]; find sign bracket; bisect 60 iters; Newton polish; certificate: monotone strictly decreasing → unique root.
+Wheeler Δw:
+Python
+def wheeler_deltaw(w, h, t):
+    if w/h >= 1/(2*np.pi):
+        return t/np.pi*(np.log(4*np.pi*w/t)+1)
+    return t/np.pi*(np.log(2*h/t)+1)
+HJ forward with w_eff: modify: microstrip_hj uses w_eff. Our existing microstrip_hj_z0 doesn't include t. New: microstrip_hj_z0_t(w,h,t,er) using w_eff in place of w (both in wh ratio and log). Inverse: initial w0 from IPC inverse, Newton on w.
+New templates (②):
+Python
+"6L_core_build": dict(desc="Polar 6L core build（L1/L6 單面 core，RF 常用）",
+    total_um=1267.00, n=6,
+    copper_um={1:35,2:35,3:35,4:35,5:35,6:35},
+    signal_layers=[1,3,4,6], plane_layers=[2,5],
+    h_microstrip_um={1:329.0, 6:329.0},
+    h_stripline_um={3:234.5, 4:234.5}),
+"10L_HDI_3press": dict(desc="Polar 10L 3 press cycle HDI（L1–L2 微盲孔；盲孔區禁閉式逆解）",
+    total_um=1520.00, n=10,
+    copper_um={1:18,2:18,3:35,4:35,5:35,6:35,7:35,8:35,9:18,10:18},
+    signal_layers=[1,3,4,7,8,10], plane_layers=[2,5,6,9],
+    h_microstrip_um={1:57.0, 10:57.0},
+    h_stripline_um={3:200.0, 4:200.0, 7:200.0, 8:200.0},
+    blind_via_layers=[1,10]),
+And core_build outer layer mapping: core build outer = microstrip but trace on core directly → use microstrip (h=core). foil build outer could use embedded; keep as is.
+assign() patch: add warning if layer in tpl.get("blind_via_layers", []).
+FEM (③): separate call. Implement:
+Python
+def fem_stripline_z0(w_trace, b, er_map, nx=240, ny=160, iters=8000, tol=1e-7):
+    # domain x:[0,L], y:[0,b]; trace: |x-L/2|<w/2 at cell row near center with V=1; planes y=0,b: V=0
+    # er_map: function er(x) or array
+    # SOR solve Laplace; energy-based C; L from air solve
+Junction: er array piecewise at x midpoint. Compute C per unit length from energy: C = ε0 Σ εr_e (Ey²+Ex²) dA (V=1 → W=C/2... C = 2W = Σ ε0εr E² dA). Then Z0 = sqrt(μ0/ε0) ... Z0 = sqrt(μ0·C_air/(ε0·C_diel)) with C per unit length in F/m.
+Grid convergence: run nx=240 and nx=360, compare Z0.
+Validation: uniform er=4.2 vs IPC analytic 50Ω point (w=0.143,b=0.4,h=0.2) → expect close (~50±3). Junction: report Z0_left, Z0_right, ΔZ%, first-order formula comparison, excess capacitance integral near junction.
+Compute C(x) per unit length locally? For junction excess: integrate (c(x) − c_far) where c(x) = local line capacitance estimate via energy density summed per column: c_col = ε0 Σ_col εr E² dy. Then L_ex = ∫(c−c_far)dx / c_far. Report.
+Then DOC-003 updates (call 4):
+header status → 次期完成
+Replace II.8 待辦 quote with 完成記錄 (certificate + error bound + HJ thickness + classification justification)
+Insert new section after II.8: "II.10 誤差界與收斂證明（次期補完）" — keep numbering? Adding II.10 after II.9 is odd ordering; insert as II.8-bis? I'll add "II.8a" hmm. Actually simpler: replace the 待辦 blockquote with new subsection "II.8A 次期補完：誤差界與收斂證書" containing theorem statements + numbers. And update §III.4 flex-rigid with FEM results. Update Part I.2 🔴 description to mention proven solve. Update appendix A rows with new verification points (HJ thickness, proven solves, FEM).
+§III.1 table flex row: "模型提案" → "FEM-v1 已驗證（附錄 C）".
+Add 附錄 C — Flex-Rigid 交界 FEM 驗證.
+Update II.7 mention? fine.
+Also update verify JSON with new rows and regenerate appendix table — easier: I'll append new rows to results list and regenerate the appendix table block inside the doc via string surgery. The doc file already exists; I'll do targeted replacements:
+> **狀態**: Phase A 首期交付（🟢🟡 章節推導完備；🟠🔴 方法定案，完整級數展開留待次期） → new status.
+The 待辦 blockquote (> **次期待辦（🟠/🔴 完整化）**...) → replacement with II.8A section.
+§III.4 flex bullet → replace with FEM results + 附錄 C reference.
+Appendix table: replace between | 案例 | 等級 | header and **跨族獨立比對** with regenerated table (I'll re-read existing rows from verify_results.json, append new ones saved in a new json, and rebuild the table section wholesale).
+§III.1 flex row text replace.
+Doable with str.replace on exact substrings I wrote earlier. I must reproduce exact original substrings — I have them from my previous write. OK.
+App patch: add warning column for blind via: modify the assign loop rows dict to include r.get("warning","")... I'll patch via replace of the stackup rows section. Simple targeted replace.
+Let me start. Call 1: rewrite library.
+Keep the library rewrite complete but I can drop unchanged docstrings slightly. I'll write it.
+Also need import numpy as np etc. Write now.
+For inverse_error_bound implementation (microstrip family):
+Given w = (B e^{−Z/A} − t)/0.8 with A, B functions of (h, er) [and h1]:
+∂w/∂Z = −B e^{−Z/A}/(0.8A) = −(w + t/0.8)/A
+For microstrip: A = 87/√(er+1.41) → ∂A/∂er = −A/(2(er+1.41)); B = 5.98h → ∂B/∂h = 5.98
+∂w/∂er via chain: w = (B e^{−Z/A} − t)/0.8; dw/dA = B e^{−Z/A}·Z/A² /0.8 = (w+t/0.8)·Z/(A²·... let me: dw/dA = (B/0.8)·e^{−Z/A}·(Z/A²) = (w + t/0.8)·Z/A²... wait d(e^{−Z/A})/dA = e^{−Z/A}·(Z/A²). Yes → dw/dA = (B/0.8)e^{−Z/A}·Z/A² = (w+t/0.8)·Z/A²... no: (B/0.8)e^{−Z/A} = w + t/0.8. So dw/dA = (w + t/0.8)·Z/A²·(1/1)? Hmm (B/0.8)·e^{−Z/A}·Z/A² = (w+t/0.8)·Z/A². Then dA/der = −A/(2(er+1.41)) → dw/der = −(w+t/0.8)·Z/(2A(er+1.41)). Good.
+∂w/∂h = e^{−Z/A}·5.98/0.8 = (w+t/0.8)/h (since B=5.98h → ∂B/∂h/B = 1/h → ∂w/∂h = (w+t/0.8)/h). Check with ∂Z/∂h = A/h and ∂w/∂Z = −(w+t/0.8)/A: product = −(w+t/0.8)/h·(−1)... sign: ∂w/∂h = ∂w/∂Z·∂Z/∂h = (−(w+t/0.8)/A)(A/h)·(−1)? Implicit: Z = A ln(B/(0.8w+t)); dZ = (∂Z/∂w)dw + (∂Z/∂h)dh = 0 → dw/dh = −(∂Z/∂h)/(∂Z/∂w) = −(A/h)/(−0.8A/(0.8w+t)) = (0.8w+t)/(0.8h) = (w + t/0.8)/h. Positive ✓ matches.
+δw bound: |δw| ≤ |∂w/∂Z|δZ + |∂w/∂h|δh + |∂w/∂er|δer + (1/0.8)δt. Implement generic via these closed forms for microstrip & stripline; for 🟠 sections add ∂w/∂χ chain: w depends on χ: w = (B e^{−Z/(Aχ))} − t)/0.8 → dw/dχ = (w+t/0.8)·Z/(Aχ²)... d(e^{−Z/(Aχ)})/dχ = e^{−Z/(Aχ)}·Z/(Aχ²). So dw/dχ = (w+t/0.8)·Z/(Aχ²)·... sign positive? Increasing χ (more coupling) at fixed target → w decreases? Hmm Z grows with χ so to keep Z* need bigger w... dw/dχ: e^{−Z/(Aχ)}: as χ↑, exponent −Z/(Aχ) ↑ (less negative), e^↑, w ↑? Wait w = (B·e^{−Z*/(Aχ)} − t)/0.8: χ↑ → −Z*/(Aχ) → 0⁻ → e → 1 → w = (B−t)/0.8 larger. Yes dw/dχ > 0. OK formula: dw/dχ = (B/0.8)e^{−Z/(Aχ)}·Z/(Aχ²) = (w+t/0.8)·Z/(Aχ²)... hmm (B/0.8)e^{−Z/(Aχ)} = w+t/0.8 ✓.
+Then χ error from h,h1 measurement: δχ = |∂χ/∂h|δh + |∂χ/∂h1|δh1. Implement numerically for each 🟠 section. Good — deliver inverse_error_bound(section, params, deltas) returning component table + total. Numeric partials for χ pieces (fine), analytic for the log-core (as derived).
+OK, writing code now. This is a big cell; let me get to it.
+FEM details:
+Python
+def fem_stripline(w, b, er_arr, L=4.0, nx=240, ny=160, omega=1.85, iters=6000, tol=1e-8):
+    dx, dy = L/nx, b/ny
+    V = zeros (ny+1, nx+1)
+    trace cells: jt = ny//2; trace x indices where |x−L/2| <= w/2 → V[jt, idx]=1 fixed
+    planes: V[0,:]=V[ny,:]=0
+    er at cell centers: er_cells[j,i] for j in 0..ny-1, i in 0..nx-1 from er_arr(x_center)
+    SOR interior updates with face er average:
+      V[j,i] = (ω/(2(1+dx²/dy²)))... use standard: V = ( (Vl+ Vr) + (dx/dy)²(Vu+Vd) )/(2(1+(dx/dy)²)) — with variable er it's a weighted harmonic... For simplicity use element-energy postprocessing with plain Laplacian update but energy with er weighting. Slight inconsistency but standard quick approach: solve with er weighting properly:
+      coefficient form: ∂x(ε ∂x V)+∂y(ε ∂y V)=0. Update:
+      aE = 0.5*(er[j,i]+er[j,i+1]) if i<nx-1 else ...
+      V = (aW Vw + aE Ve + s²(aS Vs + aN Vn)) / (aW+aE+s²(aS+aN)), s=dx/dy
+    iterate until max change < tol
+    Energy: E field at faces: Ex[i-face] = −(V[j,i+1]−V[j,i])/dx; weight ε_face = 0.5(er left+right)
+    C = ε0 Σ er_face (Ex²+Ey²) dA   (V=1 → C=2W)
+Then L = μ0 ε0 / C_air? Units: C_air in F/m; L = μ0·(C_air/ε0) → H/m. Z0 = sqrt(L/C_diel) = sqrt(μ0 C_air/(ε0 C_diel)).
+Junction: er_arr piecewise: er=4.2 for x<2mm else 3.3. Compute column capacitance c(x_i) = ε0 Σ_j er (Ey²+Ex²) dy... per column energy → c_i (F/m per column → divide by dx to get per-length). c_far left/right averages; L_ex = Σ max(c_i − c_far_side,0)·dx / c_far. Report ΔZ = Z0_right − Z0_left.
+Also compute first-order formula ΔZ/Z ≈ (ε1−ε2)/(2ε1) = 0.9/8.4 = 10.7%; FEM: (Z_PI − Z_FR4)/Z_FR4.
+Validation uniform: compare with IPC 50Ω point.
+Compute time: 240×160=38k nodes, 6000 iters — Python loops too slow! Vectorize with numpy: SOR vectorized (red-black) or just Jacobi with numpy vector ops — Jacobi needs more iters (~2-3×), fine: 20000 Jacobi iters × vector ops on 38k = fast enough (each iter ~10 ops × 38k = 400k flops → 20000 iters = 8 Gflops — numpy ~ maybe 5-10 s. OK). Use Jacobi with numpy, monitor convergence every 500.
+Let me write it.
+DOC updates and verification in call 4. App patch in call 4 too.
+Go. Call 1 now: library rewrite.
+收到，依序執行：① DOC-003 次期補完（🟠/🔴 誤差界與收斂證明）→ ② Polar 模板擴充（6L core build、10L HDI）→ ③ Flex-Rigid 場解器驗證升級（本環境無 Speedstack 軟體，將建置獨立 2D FEM 靜電場解器作為第三方比對基準，此替代方案會在文件中明確聲明）。
+步驟 1/5：擴充核心程式庫——新增誤差界推導（隱函數定理＋χ 因子鏈式法）、證明級求解器（單調性＋二分＋牛頓拋光＋唯一性證書）、HJ 厚度聯立反解、兩個新 Polar 模板、盲孔區警示：
+
+

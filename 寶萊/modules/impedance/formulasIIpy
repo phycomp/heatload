@@ -1,0 +1,115 @@
+# 修復 Bug 3: 用 Hammerstad-Jensen 連續公式替換 IPC-2141 分段公式
+
+"""
+PCB 傳輸線阻抗經典公式庫
+Phase 1: Microstrip (Hammerstad-Jensen) + Stripline (Hammerstad-Jensen 連續公式)
+"""
+import numpy as np
+from numpy import log as ln
+from numpy import sqrt, pi
+
+
+def microstrip_z0(w, h, t, er, freq_ghz=0.0):
+    """
+    Hammerstad-Jensen 公式計算 Microstrip 特性阻抗
+    參數:
+        w, h, t: 單位 mm
+        er: 相對介電常數
+        freq_ghz: 頻率 (GHz), 0 表示靜態
+    返回:
+        (Z0_ohm, epsilon_eff)
+    """
+    w = float(w)
+    h = float(h)
+    t = float(t)
+    er = float(er)
+
+    # --- 厚度修正 (Wheeler) ---
+    if t > 0 and w > 0:
+        if w / h <= 1.0 / (2 * pi):
+            w_eff = w + (t / pi) * (1.0 + ln(4.0 * pi * w / t))
+        else:
+            w_eff = w + (t / pi) * (1.0 + ln(2.0 * h / t))
+    else:
+        w_eff = w
+
+    w_eff = max(w_eff, 1e-9)
+
+    # --- 靜態有效介電常數 ---
+    if w_eff / h <= 1.0:
+        F = (1.0 + 12.0 * h / w_eff) ** (-0.5)
+        e_eff = (er + 1.0) / 2.0 + (er - 1.0) / 2.0 * (
+            F + 0.04 * (1.0 - w_eff / h) ** 2
+        )
+    else:
+        F = (1.0 + 12.0 * h / w_eff) ** (-0.5)
+        e_eff = (er + 1.0) / 2.0 + (er - 1.0) / 2.0 * F
+
+    # --- 靜態特性阻抗 ---
+    if w_eff / h <= 1.0:
+        z0 = (60.0 / sqrt(e_eff)) * ln(
+            8.0 * h / w_eff + w_eff / (4.0 * h)
+        )
+    else:
+        z0 = (120.0 * pi / sqrt(e_eff)) / (
+            w_eff / h + 1.393 + 0.667 * ln(w_eff / h + 1.444)
+        )
+
+    # --- 頻率色散修正 (Hammerstad-Jensen dispersion) ---
+    if freq_ghz > 0.0:
+        mu0 = 4.0 * pi * 1e-7          # H/m
+        h_m = h * 1e-3                 # 轉爲 m
+        fp = z0 / (2.0 * mu0 * h_m)    # Hz
+        f_hz = freq_ghz * 1e9
+        G = 0.6 + 0.009 * z0
+        # 避免除零
+        ratio = f_hz / max(fp, 1e-6)
+        e_eff_f = er - (er - e_eff) / (1.0 + G * ratio ** 2)
+        e_eff_f = max(e_eff_f, 1.0)
+        z0_f = z0 * sqrt(e_eff / e_eff_f)
+        return z0_f, e_eff_f
+
+    return z0, e_eff
+
+
+def stripline_z0(w, h, t, er, freq_ghz=0.0):
+    """
+    Hammerstad-Jensen 對稱 Stripline 特性阻抗 (連續公式)
+    參數:
+        w: 線寬 (mm)
+        h: 上下接地平面總間距 b (mm)
+        t: 銅厚 (mm)
+        er: 相對介電常數
+        freq_ghz: 頻率 (GHz), Stripline TEM 模式下頻率依賴性極弱，Phase 1 忽略
+    返回:
+        (Z0_ohm, epsilon_eff)   # epsilon_eff 理論上等于 er
+    引用:
+        Hammerstad & Jensen, "Accurate Models for Microstrip Computer-Aided Design",
+        MTT-S International Microwave Symposium Digest, 1980.
+    """
+    w = float(w)
+    h = float(h)
+    t = float(t)
+    er = float(er)
+
+    # --- 厚度修正 (Hammerstad-Jensen) ---
+    if t > 0 and w > 0:
+        if w / t <= 1.0 / (2 * pi):
+            dw = (t / pi) * (1.0 + ln(4.0 * pi * w / t))
+        else:
+            dw = (t / pi) * (1.0 + ln(2.0 * h / t))
+        we = w - dw
+        we = max(we, 1e-9)
+    else:
+        we = w
+
+    # --- 特性阻抗 (連續公式，無 w/h 分段) ---
+    z0 = (30.0 * pi / sqrt(er)) / (we / h + 0.441)
+
+    # Stripline 爲 TEM 模式，有效介電常數等于材料介電常數
+    return z0, er
+
+#with open("/mnt/agents/output/pcb_calc_app/modules/impedance/formulas.py", "w", encoding="utf-8") as f:
+#    f.write(formulas_fixed)
+#
+#print("✅ formulas.py 已修復 (Stripline 改用 Hammerstad-Jensen 連續公式)")

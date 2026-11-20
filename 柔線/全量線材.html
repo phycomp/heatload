@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>量子計算柔性傳輸線材分析系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card { transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .tab-active { border-bottom: 3px solid #667eea; color: #667eea; }
+        .slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 5px; background: #d3d3d3; outline: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #667eea; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-8">
+            <h1 class="text-4xl font-bold mb-2">⚛️ 量子計算柔性傳輸線材分析系統</h1>
+            <p class="text-blue-100">Quantum Computing Flexible Cable Analysis System</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6">
+            <div class="flex space-x-8">
+                <button onclick="showTab('database')" id="tab-database" class="tab-active py-4 px-2 font-medium">📋 線材資料庫</button>
+                <button onclick="showTab('calculator')" id="tab-calculator" class="py-4 px-2 font-medium text-gray-600 hover:text-gray-900">🔀 串擾計算器</button>
+                <button onclick="showTab('comparison')" id="tab-comparison" class="py-4 px-2 font-medium text-gray-600 hover:text-gray-900">📈 效能比較</button>
+                <button onclick="showTab('thermal')" id="tab-thermal" class="py-4 px-2 font-medium text-gray-600 hover:text-gray-900">🌡️ 熱分析</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        
+        <!-- Database Tab -->
+        <div id="content-database" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">線材規格資料庫</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Delft CF1 -->
+                <div class="card bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">Cri/oFlex 1</h3>
+                            <p class="text-sm text-gray-500">Delft Circuits</p>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Stripline</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>頻率範圍:</span> <span class="font-medium">DC-18GHz</span></div>
+                        <div class="flex justify-between"><span>通道數:</span> <span class="font-medium">8/Flex</span></div>
+                        <div class="flex justify-between"><span>串擾:</span> <span class="font-medium text-green-600">-60dB</span></div>
+                        <div class="flex justify-between"><span>4K熱負載:</span> <span class="font-medium">250µW</span></div>
+                        <div class="flex justify-between"><span>彎曲半徑:</span> <span class="font-medium">1mm</span></div>
+                    </div>
+                </div>
+
+                <!-- Delft CF2 -->
+                <div class="card bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-600">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">Cri/oFlex 2</h3>
+                            <p class="text-sm text-gray-500">Delft Circuits</p>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Stripline</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>頻率範圍:</span> <span class="font-medium">DC-26GHz</span></div>
+                        <div class="flex justify-between"><span>通道數:</span> <span class="font-medium">8/Flex</span></div>
+                        <div class="flex justify-between"><span>串擾:</span> <span class="font-medium text-green-600">-60dB</span></div>
+                        <div class="flex justify-between"><span>4K熱負載:</span> <span class="font-medium">250µW</span></div>
+                        <div class="flex justify-between"><span>材料:</span> <span class="font-medium">Ag/NbTi</span></div>
+                    </div>
+                </div>
+
+                <!-- Rigetti -->
+                <div class="card bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">High-Density Flex</h3>
+                            <p class="text-sm text-gray-500">Rigetti Computing</p>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Multi-channel</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>頻率範圍:</span> <span class="font-medium">DC-18GHz</span></div>
+                        <div class="flex justify-between"><span>通道數:</span> <span class="font-medium text-purple-600 font-bold">10/Flex</span></div>
+                        <div class="flex justify-between"><span>串擾:</span> <span class="font-medium text-green-600">-60dB</span></div>
+                        <div class="flex justify-between"><span>4K熱負載:</span> <span class="font-medium text-green-600">200µW</span></div>
+                        <div class="flex justify-between"><span>特色:</span> <span class="font-medium">3D Signaling</span></div>
+                    </div>
+                </div>
+
+                <!-- Rosenberger 047 -->
+                <div class="card bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">RFlex 047</h3>
+                            <p class="text-sm text-gray-500">Rosenberger</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Coaxial</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>頻率範圍:</span> <span class="font-medium text-yellow-600 font-bold">DC-70GHz</span></div>
+                        <div class="flex justify-between"><span>通道數:</span> <span class="font-medium">1</span></div>
+                        <div class="flex justify-between"><span>串擾:</span> <span class="font-medium text-green-600">-100dB</span></div>
+                        <div class="flex justify-between"><span>4K熱負載:</span> <span class="font-medium">400µW</span></div>
+                        <div class="flex justify-between"><span>連接器:</span> <span class="font-medium">WSMP</span></div>
+                    </div>
+                </div>
+
+                <!-- Rosenberger 402 -->
+                <div class="card bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-600">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">RFlex 402</h3>
+                            <p class="text-sm text-gray-500">Rosenberger</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Coaxial</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>頻率範圍:</span> <span class="font-medium">DC-60GHz</span></div>
+                        <div class="flex justify-between"><span>通道數:</span> <span class="font-medium">1</span></div>
+                        <div class="flex justify-between"><span>串擾:</span> <span class="font-medium text-green-600">-100dB</span></div>
+                        <div class="flex justify-between"><span>4K熱負載:</span> <span class="font-medium">350µW</span></div>
+                        <div class="flex justify-between"><span>特色:</span> <span class="font-medium">Low Loss</span></div>
+                    </div>
+                </div>
+
+                <!-- Amphenol -->
+                <div class="card bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">SMP Flex</h3>
+                            <p class="text-sm text-gray-500">Amphenol RF</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Micro-coaxial</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>頻率範圍:</span> <span class="font-medium">DC-26.5GHz</span></div>
+                        <div class="flex justify-between"><span>通道數:</span> <span class="font-medium">1</span></div>
+                        <div class="flex justify-between"><span>串擾:</span> <span class="font-medium text-green-600">-60dB</span></div>
+                        <div class="flex justify-between"><span>4K熱負載:</span> <span class="font-medium">450µW</span></div>
+                        <div class="flex justify-between"><span>特色:</span> <span class="font-medium">High Vibration</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Calculator Tab -->
+        <div id="content-calculator" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">串擾計算器</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="font-bold text-lg mb-4">幾何參數</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">線寬 w (mm)</label>
+                            <input type="range" min="0.1" max="5" step="0.1" value="0.5" class="slider" id="width" oninput="updateCalculator()">
+                            <span class="text-sm text-gray-600" id="width-val">0.5</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">線高 h (mm)</label>
+                            <input type="range" min="0.05" max="2" step="0.05" value="0.3" class="slider" id="height" oninput="updateCalculator()">
+                            <span class="text-sm text-gray-600" id="height-val">0.3</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">線間距 s (mm)</label>
+                            <input type="range" min="0.1" max="10" step="0.1" value="1.0" class="slider" id="spacing" oninput="updateCalculator()">
+                            <span class="text-sm text-gray-600" id="spacing-val">1.0</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">耦合長度 L (mm)</label>
+                            <input type="range" min="10" max="500" step="10" value="100" class="slider" id="length" oninput="updateCalculator()">
+                            <span class="text-sm text-gray-600" id="length-val">100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="font-bold text-lg mb-4">計算結果</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600">近端串擾 (NEXT)</p>
+                            <p class="text-2xl font-bold text-blue-600" id="next-result">-45.2 dB</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600">遠端串擾 (FEXT)</p>
+                            <p class="text-2xl font-bold text-red-600" id="fext-result">-51.3 dB</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-700"><strong>設計建議:</strong> <span id="recommendation">串擾水平良好，適合量子計算應用</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Tab -->
+        <div id="content-comparison" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">效能比較</h2>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <canvas id="comparisonChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Thermal Tab -->
+        <div id="content-thermal" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">熱負載分析</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="font-bold text-lg mb-4">系統配置</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">量子比特數量</label>
+                            <input type="number" value="1000" class="w-full border rounded-lg px-3 py-2" id="qubits" onchange="updateThermal()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">每量子比特線路數</label>
+                            <input type="number" value="4" class="w-full border rounded-lg px-3 py-2" id="lines" onchange="updateThermal()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">線材類型</label>
+                            <select class="w-full border rounded-lg px-3 py-2" id="cable-type" onchange="updateThermal()">
+                                <option value="delft">Delft Cri/oFlex 2</option>
+                                <option value="rigetti">Rigetti Flex</option>
+                                <option value="rosenberger">Rosenberger RFlex</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="font-bold text-lg mb-4">熱負載估算</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span>所需 Flex 數量</span>
+                            <span class="font-bold text-blue-600" id="flex-count">500</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                            <span>4K級熱負載</span>
+                            <span class="font-bold text-orange-600" id="heat-4k">125 mW</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                            <span>10mK級熱負載</span>
+                            <span class="font-bold text-red-600" id="heat-10mk">20 µW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-gray-400">量子計算柔性傳輸線材分析系統 v1.0 | 數據來源：製造商公開規格書</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('tab-active');
+                el.classList.add('text-gray-600');
+            });
+            
+            // Show selected
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+            document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
+        }
+
+        // Calculator update
+        function updateCalculator() {
+            const w = parseFloat(document.getElementById('width').value);
+            const h = parseFloat(document.getElementById('height').value);
+            const s = parseFloat(document.getElementById('spacing').value);
+            const L = parseFloat(document.getElementById('length').value);
+            
+            document.getElementById('width-val').textContent = w.toFixed(1);
+            document.getElementById('height-val').textContent = h.toFixed(2);
+            document.getElementById('spacing-val').textContent = s.toFixed(1);
+            document.getElementById('length-val').textContent = L.toFixed(0);
+            
+            // Simplified crosstalk calculation
+            const next = -20 * Math.log10(s / (w + h)) - 15;
+            const fext = next - 6;
+            
+            document.getElementById('next-result').textContent = next.toFixed(1) + ' dB';
+            document.getElementById('fext-result').textContent = fext.toFixed(1) + ' dB';
+            
+            let rec = '串擾水平良好，適合量子計算應用';
+            if (next > -40) rec = '⚠️ 串擾水平較高，建議增加線間距';
+            else if (next > -60) rec = 'ℹ️ 串擾水平中等，適合一般應用';
+            else rec = '✅ 串擾水平優良，適合高精度量子計算';
+            
+            document.getElementById('recommendation').textContent = rec;
+        }
+
+        // Thermal update
+        function updateThermal() {
+            const qubits = parseInt(document.getElementById('qubits').value) || 1000;
+            const lines = parseInt(document.getElementById('lines').value) || 4;
+            const type = document.getElementById('cable-type').value;
+            
+            const configs = {
+                'delft': { channels: 8, thermal4k: 250, thermal10mk: 40 },
+                'rigetti': { channels: 10, thermal4k: 200, thermal10mk: 35 },
+                'rosenberger': { channels: 1, thermal4k: 400, thermal10mk: 80 }
+            };
+            
+            const config = configs[type];
+            const totalLines = qubits * lines;
+            const flexCount = Math.ceil(totalLines / config.channels);
+            const heat4k = (flexCount * config.thermal4k / 1000).toFixed(1);
+            const heat10mk = (flexCount * config.thermal10mk / 1000).toFixed(1);
+            
+            document.getElementById('flex-count').textContent = flexCount;
+            document.getElementById('heat-4k').textContent = heat4k + ' mW';
+            document.getElementById('heat-10mk').textContent = heat10mk + ' µW';
+        }
+
+        // Initialize comparison chart
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Delft CF1', 'Delft CF2', 'Rigetti', 'Rosenberger 047', 'Amphenol SMP'],
+                datasets: [{
+                    label: '6GHz Attenuation (dB/m)',
+                    data: [22, 11, 10, 0.45, 0.55],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)'
+                }, {
+                    label: 'Thermal Load 4K (µW)',
+                    data: [250, 250, 200, 400, 450],
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Initialize
+        updateCalculator();
+        updateThermal();
+    </script>
+</body>
+</html>

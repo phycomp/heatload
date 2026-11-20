@@ -1,0 +1,7 @@
+\usepackage{newunicodechar}
+
+% 使用 Harfbuzz 渲染引擎來讀取 Noto Color Emoji
+\newfontfamily{\emojifont}{Noto Color Emoji}[Renderer=Harfbuzz]
+
+% 告訴 LaTeX 遇到星星符號時使用該字體
+\newunicodechar{⭐}{{\emojifont ⭐}}
