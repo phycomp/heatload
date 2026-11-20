@@ -126,7 +126,7 @@ Uleam Inc., Taoyuan city, Taiwan
 
 ## Appendix B. 重建 NIST 資料庫（低溫傳輸線材料子集）
 
-> 下表為代表性四材料子集（單頁展示）。完整重建資料庫——九種傳輸線材料，加上完整 42 材料 NIST 抓取資料（係數、範圍、擬合誤差）——可下載：nist_transmission_line_materials.json 於 <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json>，以及 nist_material_db_scraped.json 於 <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json>。係數如實抄錄自 NIST TRC 低溫材料性質官網；不重擬合、不編造係數；既有資料庫未修改。
+> 下表為代表性四材料子集（單頁展示）。完整重建資料庫——九種傳輸線材料，加上完整 42 材料 NIST 抓取資料（係數、範圍、擬合誤差）——可下載：[nist_transmission_line_materials.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json) 與 [nist_material_db_scraped.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json)。係數如實抄錄自 NIST TRC 低溫材料性質官網；不重擬合、不編造係數；既有資料庫未修改。
 
 | 材料 | 角色 | 纜線用途 | 變體數 | 資料範圍 (K) |
 |---|---|---|---:|---|

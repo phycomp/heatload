@@ -147,7 +147,7 @@ We show that internal consistency of a cryogenic conductivity database is not su
 
 ## Appendix B. Rebuilt NIST Database (cryogenic transmission-line subset)
 
-> A representative four-material subset is shown below (one-page display). The complete rebuilt database — nine transmission-line materials plus the full 42-material NIST scrape with coefficients, ranges and fit errors — is available for download: nist_transmission_line_materials.json at <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json>, and nist_material_db_scraped.json at <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json>. Coefficients are transcribed verbatim from the NIST TRC cryogenic material-properties website; no refitting, no invented coefficients; the pre-existing database was not modified.
+> A representative four-material subset is shown below (one-page display). The complete rebuilt database — nine transmission-line materials plus the full 42-material NIST scrape with coefficients, ranges and fit errors — is available for download: [nist_transmission_line_materials.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json) and [nist_material_db_scraped.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json). Coefficients are transcribed verbatim from the NIST TRC cryogenic material-properties website; no refitting, no invented coefficients; the pre-existing database was not modified.
 
 | Material | Role | Cable use | Variants | Data range (K) |
 |---|---|---|---:|---|
@@ -303,7 +303,7 @@ Uleam Inc., Taoyuan city, Taiwan
 
 ## Appendix B. 重建 NIST 資料庫（低溫傳輸線材料子集）
 
-> 下表為代表性四材料子集（單頁展示）。完整重建資料庫——九種傳輸線材料，加上完整 42 材料 NIST 抓取資料（係數、範圍、擬合誤差）——可下載：nist_transmission_line_materials.json 於 <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json>，以及 nist_material_db_scraped.json 於 <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json>。係數如實抄錄自 NIST TRC 低溫材料性質官網；不重擬合、不編造係數；既有資料庫未修改。
+> 下表為代表性四材料子集（單頁展示）。完整重建資料庫——九種傳輸線材料，加上完整 42 材料 NIST 抓取資料（係數、範圍、擬合誤差）——可下載：[nist_transmission_line_materials.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json) 與 [nist_material_db_scraped.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json)。係數如實抄錄自 NIST TRC 低溫材料性質官網；不重擬合、不編造係數；既有資料庫未修改。
 
 | 材料 | 角色 | 纜線用途 | 變體數 | 資料範圍 (K) |
 |---|---|---|---:|---|
@@ -700,7 +700,7 @@ The all-layer Q ≈ 3.37×10⁻⁴ W (≈336,752 nW) is dominated by two Cu plat
 
 ## Appendix B. Rebuilt NIST Database (cryogenic transmission-line subset)
 
-> A representative four-material subset is shown below (one-page display). The complete rebuilt database — nine transmission-line materials plus the full 42-material NIST scrape with coefficients, ranges and fit errors — is available for download: nist_transmission_line_materials.json at <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json>, and nist_material_db_scraped.json at <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json>. Coefficients are transcribed verbatim from the NIST TRC cryogenic material-properties website; no refitting, no invented coefficients; the pre-existing database was not modified.
+> A representative four-material subset is shown below (one-page display). The complete rebuilt database — nine transmission-line materials plus the full 42-material NIST scrape with coefficients, ranges and fit errors — is available for download: [nist_transmission_line_materials.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json) and [nist_material_db_scraped.json](https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json). Coefficients are transcribed verbatim from the NIST TRC cryogenic material-properties website; no refitting, no invented coefficients; the pre-existing database was not modified.
 
 | Material | Role | Cable use | Variants | Data range (K) |
 |---|---|---|---:|---|
