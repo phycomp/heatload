@@ -1,0 +1,189 @@
+{
+  "generator": "build_compare_viz.py",
+  "created_at": "2026-11-20T09:05:18.375965+00:00",
+  "policy": "同源比較；只讀兩份論文；不改內容；topic-viz 已移除離線 HTML 規則，改用 Excel",
+  "sources": {
+    "nature": "/home/sam/量傳線/docs/heatload_distill_nature_manuscript.md",
+    "compiled": "/home/sam/量傳線/docs/heatload-distill_paper_consolidated_final.md"
+  },
+  "stats": {
+    "nature": {
+      "chars": 17381,
+      "words": 2328,
+      "figure_mentions": 0,
+      "table_rows": 0,
+      "math_tokens": 0
+    },
+    "compiled": {
+      "chars": 59365,
+      "words": 7512,
+      "figure_mentions": 0,
+      "table_rows": 93,
+      "math_tokens": 31
+    }
+  },
+  "sections": {
+    "nature": [
+      {
+        "title": "Abstract",
+        "chars": 1478
+      },
+      {
+        "title": "1. Introduction",
+        "chars": 3007
+      },
+      {
+        "title": "2. Provenance as the basis of heat-load estimates",
+        "chars": 1555
+      },
+      {
+        "title": "3. Model and validation framework",
+        "chars": 1217
+      },
+      {
+        "title": "4. Results",
+        "chars": 3019
+      },
+      {
+        "title": "5. Discussion",
+        "chars": 1950
+      },
+      {
+        "title": "6. Conclusion",
+        "chars": 687
+      },
+      {
+        "title": "References (verified identifiers only)",
+        "chars": 1453
+      },
+      {
+        "title": "Chinese notes on structure and intent（中文結構說明）",
+        "chars": 404
+      },
+      {
+        "title": "Section outline",
+        "chars": 410
+      },
+      {
+        "title": "Assumptions or missing inputs",
+        "chars": 268
+      },
+      {
+        "title": "Claim-evidence map",
+        "chars": 414
+      },
+      {
+        "title": "Why this structure",
+        "chars": 217
+      },
+      {
+        "title": "To redirect me",
+        "chars": 84
+      }
+    ],
+    "compiled": [
+      {
+        "title": "Abstract",
+        "chars": 3104
+      },
+      {
+        "title": "Citations and Provenance (compiled)",
+        "chars": 5449
+      },
+      {
+        "title": "Chapters (compiled)",
+        "chars": 0
+      },
+      {
+        "title": "1. Introduction",
+        "chars": 4132
+      },
+      {
+        "title": "2. Provenance and SSOT as the Basis for Heat-Load Estimates",
+        "chars": 3708
+      },
+      {
+        "title": "3. Models and Numerical Formulation",
+        "chars": 8835
+      },
+      {
+        "title": "4. Heatload-Distill Workflow and Same-Source Artifacts",
+        "chars": 2038
+      },
+      {
+        "title": "5. Reliability Evidence Review (Kapton and NbTi Cases)",
+        "chars": 2901
+      },
+      {
+        "title": "6. Discussion and Practical Guidance for Cryogenic Heat-Load Estimation",
+        "chars": 1504
+      },
+      {
+        "title": "7. Limitations",
+        "chars": 906
+      },
+      {
+        "title": "8. Conclusion",
+        "chars": 825
+      },
+      {
+        "title": "9. Rebuilding the Coefficient Database from NIST and Curve Comparison",
+        "chars": 3168
+      },
+      {
+        "title": "10. Implications for Heat-Load Estimation",
+        "chars": 1050
+      },
+      {
+        "title": "Appendix A. SSOT Raw Coefficient Reference Data (54 entries)",
+        "chars": 15668
+      },
+      {
+        "title": "References (compiled)",
+        "chars": 1404
+      },
+      {
+        "title": "Availability and Source Artifacts (compiled)",
+        "chars": 2875
+      }
+    ]
+  },
+  "axis_comparison": [
+    {
+      "axis": "寫作風格",
+      "nature": "Nature-style research/review, claim-first, bounded verbs",
+      "compiled": "Cryogenics-style compiled (abstract→citation→chapter→reference→appendix)"
+    },
+    {
+      "axis": "語言",
+      "nature": "EN (zh-to-en)",
+      "compiled": "EN (compiled from aligned EN/ZH sources)"
+    },
+    {
+      "axis": "章節",
+      "nature": "Abstract/Intro/Provenance/Model/Results/Discussion/Conclusion",
+      "compiled": "Abstract/Citation/Chapters 1-10/Appendix A/References/Availability"
+    },
+    {
+      "axis": "核心主張",
+      "nature": "Provenance measurable; internal consistency ≠ reliability",
+      "compiled": "Heatload-Distill four-step workflow + raw data appendix + NIST rebuild §9-10"
+    },
+    {
+      "axis": "新增內容",
+      "nature": "NIST rebuild + mis-assignments + curve comparison 為主軸",
+      "compiled": "前述為 §9-10 延伸章節，保留原有 4-step/溫區擬合/Appendix A"
+    },
+    {
+      "axis": "證據邊界",
+      "nature": "no refit, no new measurement, verified IDs",
+      "compiled": "D4=A SSOT, no refit, raw data appendix (54 entries), degradation disclosed"
+    },
+    {
+      "axis": "期刊",
+      "nature": "generic Nature-style",
+      "compiled": "Cryogenics-targeted compiled"
+    }
+  ],
+  "evidence_note": "兩份同源：Nature-style 由 compiled/extends  material 寫成；比較僅描述結構/主張/邊界差異，不判定優劣。"
+}
