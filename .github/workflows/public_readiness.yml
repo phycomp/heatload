@@ -1,0 +1,19 @@
+name: public-readiness
+# 硬性規則 CI 守門：每次 push/PR 自動跑公開就绪檢查（docs/公開repo_排除決策.md R1–R10）
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run hard-rule guard
+        run: python3 scripts/check_public_readiness.py

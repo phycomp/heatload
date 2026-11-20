@@ -1,0 +1,11 @@
+#!/bin/sh
+# 硬性規則 R1–R10 守門：push 前強制跑 check_public_readiness.py，失敗即阻擋。
+# 啟用：git config core.hooksPath .githooks
+set -e
+REPO=$(git rev-parse --show-toplevel)
+echo "[pre-push] 執行公開 readiness 硬性檢查..."
+if ! python3 "$REPO/scripts/check_public_readiness.py"; then
+  echo "[pre-push] 檢查失敗，已阻擋 push。見 docs/公開repo_排除決策.md" >&2
+  exit 1
+fi
+echo "[pre-push] 硬性規則全過，允許 push。"
