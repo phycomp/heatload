@@ -145,4 +145,4 @@ Uleam Inc., Taoyuan city, Taiwan
 5. Zhou, J. *et al.* (2019 preprint / 2020 publication). A Thermal Resistance Network Model for Heat Conduction of Amorphous Polymers. *Phys. Rev. Materials* 4, 015601 (published 2020-01-17). DOI 10.1103/PhysRevMaterials.4.015601; arXiv:1909.07607.
 6. Drobizhev, A. *et al.* (2017). Thermal conductivity measurements of PTFE and Al₂O₃ ceramic at sub-Kelvin temperatures. *Cryogenics* 85, 63–70. DOI 10.1016/j.cryogenics.2017.05.008; arXiv:1612.02514.
 7. van Ostaay, J. A. M. & Mukhin, S. I. (2018). Phonon-kink scattering effect on the low temperature thermal transport in solids. *Low Temp. Phys.* 44(6), 747–757. DOI 10.1063/1.5037562; arXiv:1805.02019.
-8. NIST Cryogenic Material Properties. https://trc.nist.gov/cryogenics/materials/materialproperties.htm
+8. NIST Cryogenic Material Properties. [NIST TRC 材料性質官網](https://trc.nist.gov/cryogenics/materials/materialproperties.htm)

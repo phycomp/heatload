@@ -40,9 +40,9 @@ Using the same-source four-step snapshot, we review 54 database entries (48 `log
 
 ### Key verified references (from provenance snapshot)
 - **Raicu et al. (2025) Cryogenic thermal modeling of microwave high density signaling** — `10.1140/epjqt/s40507-025-00427-1`: Table 4: k(T) 9-coeff fits (outer/dielectric/PTFE/inner). Table 6: rho(T) inner. PTFE coeffs sourced from NIST Cryogenics Index [9,10] per Table 4 note.
-- **NIST Cryogenics Index of Material Properties** — `https://trc.nist.gov/cryogenics/materials/materialproperties.htm`: Cryogenic material property fits (a..i 9 coefficients) and valid ranges; primary database source for many entries.
-- **NIST Cryogenics Material Properties: Equations** — `https://trc.nist.gov/cryogenics/materials/materialproperties.htm (equations)`: log-log polynomial form log10(y)=a+b(log10 T)+...+i(log10 T)^8 and related equation types.
-- **Marquardt, Le & Radebaugh (2000) Cryogenic Material Properties Database** — `https://cryocooler.org/resources/Documents/C11/247.pdf`: Defines 9-parameter (a..i) cryogenic material property fits.
+- **NIST Cryogenics Index of Material Properties** — [NIST TRC material properties](https://trc.nist.gov/cryogenics/materials/materialproperties.htm): Cryogenic material property fits (a..i 9 coefficients) and valid ranges; primary database source for many entries.
+- **NIST Cryogenics Material Properties: Equations** — [NIST material properties (equations)](https://trc.nist.gov/cryogenics/materials/materialproperties.htm): log-log polynomial form log10(y)=a+b(log10 T)+...+i(log10 T)^8 and related equation types.
+- **Marquardt, Le & Radebaugh (2000) Cryogenic Material Properties Database** — [C11/247.pdf](https://cryocooler.org/resources/Documents/C11/247.pdf): Defines 9-parameter (a..i) cryogenic material property fits.
 - **Bradley et al. (2006) Cryogenic Material Properties Database, Update 2006**: Database update (referenced by sources).
 - **Simon, Drexler & Reed (1992) Properties of Copper and Copper Alloys at Cryogenic Temperatures**: OFHC Cu rational-form conductivity data/fits (RRR variants).
 - **Flynn, Cryogenic Engineering**: Textbook basis for cryogenic heat load / multi-stage modeling (cited in skill overview).
@@ -235,7 +235,7 @@ Heatload-Distill consolidates provenance, modeling, numerical-solution context, 
 ## 9. Rebuilding the Coefficient Database from NIST and Curve Comparison
 > **New work (2026-11-20):** evidence-bounded; independent new DB, SSOT unchanged; no refit.
 
-To test whether the SSOT fixed coefficients remain faithful to their authoritative source, an independent database was rebuilt from the NIST cryogenic material-properties website (`https://trc.nist.gov/cryogenics/materials/materialproperties.htm`, fetched 2026-11-20). A requests-based scraper retrieved 42 material pages, extracting thermal-conductivity a–i coefficients, data/equation ranges, and fit errors; seven pages without a conductivity table or returning 404 were recorded as `errors` and excluded without guessing values. Sources: the scraped NIST database.
+To test whether the SSOT fixed coefficients remain faithful to their authoritative source, an independent database was rebuilt from the NIST cryogenic material-properties website ([NIST TRC material properties](https://trc.nist.gov/cryogenics/materials/materialproperties.htm), fetched 2026-11-20). A requests-based scraper retrieved 42 material pages, extracting thermal-conductivity a–i coefficients, data/equation ranges, and fit errors; seven pages without a conductivity table or returning 404 were recorded as `errors` and excluded without guessing values. Sources: the scraped NIST database.
 
 The scope was narrowed to cryogenic transmission-line materials — conductors/shields (OFHC Cu RRR variants, stainless steel 304/304L/316, BeCu, brass, Invar) and dielectrics (PTFE, polyimide/Kapton) — mapped to cable components from verified literature: SC-086/50-SCN-CN semi-rigid coax (C7150/Ag-C7150/PTFE; Raicu 2025), FLAX (Nb47Ti + PFA; Smith 2020/2024), Cri/oFlex 3 (NbTi + Kapton), and stainless/NbTi coax (Krinner 2019). C7150, Ag-coated C7150, PFA and NbTi have no NIST web entry and remain as SSOT literature-based entries. Sources: the transmission-line material subset (9 cable-material entries).
 
@@ -383,11 +383,11 @@ Remaining materials (Beryllium Copper, Brass, Invar, SS 304L, SS 316) and the fu
 
 ## References (compiled)
 
-1. Raicu, N., Hogan, T., Wu, X., Vahidpour, M., Snow, D., Hollister, M., & Field, M. (2025). *Cryogenic thermal modeling of microwave high density signaling*. EPJ Quantum Technology, 12:124. https://doi.org/10.1140/epjqt/s40507-025-00427-1 (Dataset: https://doi.org/10.5281/zenodo.15238913)
-2. NIST Cryogenics Index of Material Properties. https://trc.nist.gov/cryogenics/materials/materialproperties.htm
+1. Raicu, N., Hogan, T., Wu, X., Vahidpour, M., Snow, D., Hollister, M., & Field, M. (2025). *Cryogenic thermal modeling of microwave high density signaling*. EPJ Quantum Technology, 12:124. [doi:10.1140/epjqt/s40507-025-00427-1](https://doi.org/10.1140/epjqt/s40507-025-00427-1) (Dataset: [doi:10.5281/zenodo.15238913](https://doi.org/10.5281/zenodo.15238913))
+2. NIST Cryogenics Index of Material Properties. [NIST TRC material properties](https://trc.nist.gov/cryogenics/materials/materialproperties.htm)
 3. Marquardt, E. D., Le, J. P., & Radebaugh, R. (2000). *Cryogenic Material Properties Database*. 11th International Cryocooler Conference. (Bibliographic details as recorded in project citations.)
 4. Bradley, P. E., et al. (2006). *Cryogenic Material Properties Database, Update 2006*. ICEC 21. (Bibliographic details as recorded in project citations.)
 5. Simon, N. J., Drexler, E. S., & Reed, R. P. (1992). *Properties of Copper and Copper Alloys at Cryogenic Temperatures*. NIST Monograph 177. NIST.
 6. Flynn, T. M. *Cryogenic Engineering*. (Edition/publisher details not fully specified in project citations.)
-7. Smith, J. P., Mazin, B. A., Boaventura, A., Thompson, K. J., & Daal, M. (2024). *Improved Flexible Coaxial Ribbon Cable for High-Density Superconducting Arrays*. IEEE Transactions on Applied Superconductivity, 34(2), 1–6. https://doi.org/10.1109/TASC.2024.3350516 (arXiv:2306.13574, https://arxiv.org/abs/2306.13574)
+7. Smith, J. P., Mazin, B. A., Boaventura, A., Thompson, K. J., & Daal, M. (2024). *Improved Flexible Coaxial Ribbon Cable for High-Density Superconducting Arrays*. IEEE Transactions on Applied Superconductivity, 34(2), 1–6. [doi:10.1109/TASC.2024.3350516](https://doi.org/10.1109/TASC.2024.3350516) (arXiv:2306.13574, [arXiv:2306.13574](https://arxiv.org/abs/2306.13574))
 
