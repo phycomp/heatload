@@ -1,0 +1,589 @@
+{
+  "generator": "curve_compare.py",
+  "created_at": "2026-11-20T08:44:09.010150+00:00",
+  "model": "9-param log-log: kappa(T)=10^(sum_{n=0}^8 c_n (log10 T)^n); same as SSOT thermal_load.py",
+  "policy": "不重擬合；新 DB 與 SSOT 逐值對帳；錯位標註；SSOT 未修改",
+  "source_new_db": "https://trc.nist.gov/cryogenics/materials/materialproperties.htm",
+  "scraped_at": "2026-11-20T08:40:42.470399+00:00",
+  "sample_temperatures_K": [
+    4,
+    10,
+    20,
+    40,
+    77,
+    150,
+    293
+  ],
+  "comparisons": [
+    {
+      "material": "Teflon",
+      "role": "介電質 PTFE",
+      "cables": [
+        "SC-086/50-SCN-CN 半剛性同軸 (Raicu 2025)",
+        "一般 PTFE 同軸介電"
+      ],
+      "ssot_name": "Teflon (PTFE)",
+      "new_coeffs_a_i": [
+        2.738,
+        -30.677,
+        89.43,
+        -136.99,
+        124.69,
+        -69.556,
+        23.32,
+        -4.3135,
+        0.33829
+      ],
+      "ssot_coeffs_c0_c8": [
+        -2.0,
+        0.5,
+        -0.1,
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "coeffs_exact_match": false,
+      "common_range_K": [
+        4.0,
+        300.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77,
+        150,
+        293
+      ],
+      "out_of_range_excluded": [],
+      "new_curve": [
+        0.04599485452078777,
+        0.09545309177931942,
+        0.14217365004708582,
+        0.195277090871282,
+        0.2323918010237005,
+        0.25860316310746617,
+        0.27258720936236347
+      ],
+      "ssot_curve": [
+        0.01849118300275316,
+        0.025703957827688632,
+        0.03186173014625794,
+        0.038502487203657065,
+        0.0451333905692685,
+        0.05218604138503507,
+        0.059567568270770435
+      ]
+    },
+    {
+      "material": "Polyimide (Kapton)",
+      "role": "介電質基材 Polyimide",
+      "cables": [
+        "Cri/oFlex 3 (Delft)",
+        "NbTi-on-polyimide flex",
+        "FLAX 替代比較"
+      ],
+      "ssot_name": "Polyimide (Kapton)",
+      "new_coeffs_a_i": [
+        5.73101,
+        -39.5199,
+        79.9313,
+        -83.8572,
+        50.9157,
+        -17.9835,
+        3.42413,
+        -0.27133,
+        0.0
+      ],
+      "ssot_coeffs_c0_c8": [
+        5.73101,
+        -39.5199,
+        79.9313,
+        -83.8572,
+        50.9157,
+        -17.9835,
+        3.42413,
+        -0.27133,
+        0
+      ],
+      "coeffs_exact_match": true,
+      "common_range_K": [
+        4.0,
+        300.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77,
+        150,
+        293
+      ],
+      "out_of_range_excluded": [],
+      "new_curve": [
+        0.010789122886097256,
+        0.023453626245486484,
+        0.047819835898459236,
+        0.08318838478382685,
+        0.125521904011156,
+        0.1630784906325909,
+        0.19072299969147002
+      ],
+      "ssot_curve": [
+        0.010789122886097256,
+        0.023453626245486484,
+        0.047819835898459236,
+        0.08318838478382685,
+        0.125521904011156,
+        0.1630784906325909,
+        0.19072299969147002
+      ]
+    },
+    {
+      "material": "Stainless Steel 304",
+      "role": "外導體/支撐 (不鏽鋼)",
+      "cables": [
+        "不鏽鋼同軸線 (Krinner 2019)",
+        "semi-rigid coax 外導體"
+      ],
+      "ssot_name": "Stainless Steel 304 (UNS S30400)",
+      "new_coeffs_a_i": [
+        -1.4087,
+        1.3982,
+        0.2543,
+        -0.626,
+        0.2334,
+        0.4256,
+        -0.4658,
+        0.165,
+        -0.0199
+      ],
+      "ssot_coeffs_c0_c8": [
+        -1.4087,
+        1.3982,
+        0.2543,
+        -0.626,
+        0.2334,
+        0.4256,
+        -0.4658,
+        0.165,
+        -0.0199
+      ],
+      "coeffs_exact_match": true,
+      "common_range_K": [
+        4.0,
+        300.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77,
+        150,
+        293
+      ],
+      "out_of_range_excluded": [],
+      "new_curve": [
+        0.2723961889664811,
+        0.903857570660176,
+        2.168622406294646,
+        4.670281000271134,
+        7.920651602258382,
+        11.165154358588241,
+        15.12334394314148
+      ],
+      "ssot_curve": [
+        0.2723961889664811,
+        0.903857570660176,
+        2.168622406294646,
+        4.670281000271134,
+        7.920651602258382,
+        11.165154358588241,
+        15.12334394314148
+      ]
+    },
+    {
+      "material": "Stainless Steel 304L",
+      "role": "外導體/支撐 (不鏽鋼 304L)",
+      "cables": [
+        "不鏽鋼同軸線 (Krinner 2019)"
+      ],
+      "ssot_name": "Stainless Steel 304L (UNS S30403)",
+      "new_coeffs_a_i": [
+        -1.4087,
+        1.3982,
+        0.2543,
+        -0.626,
+        0.2334,
+        0.4256,
+        -0.4658,
+        0.165,
+        -0.0199
+      ],
+      "ssot_coeffs_c0_c8": [
+        -1.4087,
+        1.3982,
+        0.2543,
+        -0.626,
+        0.2334,
+        0.4256,
+        -0.4658,
+        0.165,
+        -0.0199
+      ],
+      "coeffs_exact_match": true,
+      "common_range_K": [
+        4.0,
+        300.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77,
+        150,
+        293
+      ],
+      "out_of_range_excluded": [],
+      "new_curve": [
+        0.2723961889664811,
+        0.903857570660176,
+        2.168622406294646,
+        4.670281000271134,
+        7.920651602258382,
+        11.165154358588241,
+        15.12334394314148
+      ],
+      "ssot_curve": [
+        0.2723961889664811,
+        0.903857570660176,
+        2.168622406294646,
+        4.670281000271134,
+        7.920651602258382,
+        11.165154358588241,
+        15.12334394314148
+      ]
+    },
+    {
+      "material": "Stainless Steel 316",
+      "role": "外導體/護套 (不鏽鋼 316)",
+      "cables": [
+        "不鏽鋼同軸線 (Krinner 2019)"
+      ],
+      "ssot_name": "Stainless Steel 316 (UNS S31600)",
+      "new_coeffs_a_i": [
+        -1.4087,
+        1.3982,
+        0.2543,
+        -0.626,
+        0.2334,
+        0.4256,
+        -0.4658,
+        0.165,
+        -0.0199
+      ],
+      "ssot_coeffs_c0_c8": [
+        -1.4087,
+        1.3982,
+        0.2543,
+        -0.626,
+        0.2334,
+        0.4256,
+        -0.4658,
+        0.165,
+        -0.0199
+      ],
+      "coeffs_exact_match": true,
+      "common_range_K": [
+        4.0,
+        300.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77,
+        150,
+        293
+      ],
+      "out_of_range_excluded": [],
+      "new_curve": [
+        0.2723961889664811,
+        0.903857570660176,
+        2.168622406294646,
+        4.670281000271134,
+        7.920651602258382,
+        11.165154358588241,
+        15.12334394314148
+      ],
+      "ssot_curve": [
+        0.2723961889664811,
+        0.903857570660176,
+        2.168622406294646,
+        4.670281000271134,
+        7.920651602258382,
+        11.165154358588241,
+        15.12334394314148
+      ]
+    },
+    {
+      "material": "Beryllium Copper",
+      "role": "彈性導體/connector",
+      "cables": [
+        "同軸連接器彈簧接觸"
+      ],
+      "ssot_name": null,
+      "new_coeffs_a_i": [
+        -0.50015,
+        1.9319,
+        -1.6954,
+        0.71218,
+        1.2788,
+        -1.6145,
+        0.68722,
+        -0.10501,
+        0.0
+      ],
+      "ssot_coeffs_c0_c8": null,
+      "coeffs_exact_match": false,
+      "common_range_K": [
+        2.0,
+        80.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77
+      ],
+      "out_of_range_excluded": [
+        150,
+        293
+      ],
+      "new_curve": [
+        1.8787680252180128,
+        4.954958255552625,
+        10.662934066981917,
+        21.475681324583903,
+        36.28874818405957
+      ],
+      "ssot_curve": null
+    },
+    {
+      "material": "Brass",
+      "role": "連接器/接頭",
+      "cables": [
+        "同軸接頭 (connector)"
+      ],
+      "ssot_name": "Brass (UNS C2600)",
+      "new_coeffs_a_i": [
+        0.021035,
+        -1.01835,
+        4.54083,
+        -5.03374,
+        3.20536,
+        -1.12933,
+        0.174057,
+        -0.0038151,
+        0.0
+      ],
+      "ssot_coeffs_c0_c8": [
+        -0.786,
+        1.37,
+        -0.5,
+        0.1,
+        -0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "coeffs_exact_match": false,
+      "common_range_K": [
+        5.0,
+        116.0
+      ],
+      "sample_T_in_range": [
+        10,
+        20,
+        40,
+        77
+      ],
+      "out_of_range_excluded": [
+        4,
+        150,
+        293
+      ],
+      "new_curve": [
+        5.702258483527843,
+        12.33247507731973,
+        24.117337823927773,
+        39.79577522853466
+      ],
+      "ssot_curve": [
+        1.4927944095789965,
+        2.1960517358572877,
+        2.9568822482532884,
+        3.6625871011807662
+      ]
+    },
+    {
+      "material": "Invar (Fe-36Ni)",
+      "role": "低熱膨脹支撐/屏蔽",
+      "cables": [
+        "低溫對準結構/屏蔽"
+      ],
+      "ssot_name": "Invar (Fe-36Ni) (UNS K93600)",
+      "new_coeffs_a_i": [
+        -2.7064,
+        8.5191,
+        -15.923,
+        18.276,
+        -11.9116,
+        4.40318,
+        -0.86018,
+        0.068508,
+        0.0
+      ],
+      "ssot_coeffs_c0_c8": [
+        -0.5,
+        0.8,
+        -0.3,
+        0.05,
+        -0.005,
+        0,
+        0,
+        0,
+        0
+      ],
+      "coeffs_exact_match": false,
+      "common_range_K": [
+        4.0,
+        300.0
+      ],
+      "sample_T_in_range": [
+        4,
+        10,
+        20,
+        40,
+        77,
+        150,
+        293
+      ],
+      "out_of_range_excluded": [],
+      "new_curve": [
+        0.2418634292229617,
+        0.7338511852474293,
+        1.6520688127559782,
+        3.4370489604328576,
+        6.1890858340877095,
+        10.111344763217152,
+        13.761595959983925
+      ],
+      "ssot_curve": [
+        0.7641168908701562,
+        1.1091748152624012,
+        1.345258611011819,
+        1.5287064683954725,
+        1.6364323314139089,
+        1.672524428418257,
+        1.6341763650977463
+      ]
+    }
+  ],
+  "misassignment_flags": [
+    {
+      "ssot_material": "Aluminum 1100 (UNS A91100)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Aluminum 6061-T6",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Aluminum 6061-T6 (UNS A96061)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Aluminum 6061-T6",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Aluminum 6063-T5 (UNS A96063)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Aluminum 6061-T6",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Inconel 718 (UNS N107718)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Inconel 718",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Stainless Steel 304 (UNS S30400)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Stainless Steel 316",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Stainless Steel 304L (UNS S30403)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Stainless Steel 316",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Stainless Steel 310 (UNS S31000)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Stainless Steel 316",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Stainless Steel 316 (UNS S31600)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Stainless Steel 316",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Ti-6Al-4V (UNS R56400)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Ti-6Al-4V",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Fiberglass Epoxy G-10 (Normal)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Fiberglass Epoxy G-10",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Polyamide (Nylon)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Teflon",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Polyethylene Terephthalate (Mylar)",
+      "ssot_source": "NIST Cryogenics Index of Material Properties（經 量傳線/熱負載/pages/10nist低溫庫.py）；Marquardt/Le/Radebaugh 2000、Bradley 2006",
+      "coefficients_match_nist_material": "Polyamide (Nylon)",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    },
+    {
+      "ssot_material": "Raicu dielectric (PTFE)",
+      "ssot_source": "Raicu et al. 2025, EPJQT 12:124, Table 4 (k(T))；PTFE 源自 NIST DB [9,10]",
+      "coefficients_match_nist_material": "Teflon",
+      "note": "SSOT 此筆係數與 NIST 官網另一材料的 a-i 完全相同 → 疑似交叉误植/通用擬合"
+    }
+  ],
+  "errors": [
+    {
+      "name": "Copper (OFHC)",
+      "reason": "no log-log variant (Cu rational handled separately)"
+    }
+  ]
+}

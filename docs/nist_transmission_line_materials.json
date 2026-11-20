@@ -1,0 +1,426 @@
+{
+  "generator": "build_transmission_line_db.py",
+  "source": "NIST TRC cryogenic material properties (scraped from 官網)",
+  "source_index": "https://trc.nist.gov/cryogenics/materials/materialproperties.htm",
+  "scraped_at": "2026-11-20T08:40:42.470399+00:00",
+  "built_at": "2026-11-20T08:42:28.145284+00:00",
+  "scope": "低溫傳輸線材料子集：SC coax / FLAX / Cri-oFlex 3 / NbTi-polyimide flex / stainless-NbTi coax",
+  "policy": "如實抄錄 NIST 官網 a-i；不重擬合、不編造；SSOT 未修改；抓錯/404 材料不納入",
+  "evidence_basis": {
+    "Raicu2025": "arXiv:2502.01945v3 — SC-086 coax: C7150 外導體 / Ag-coated C7150 內導體 / PTFE 介電",
+    "Smith2020_2024": "arXiv:2007.06496v1, arXiv:2306.13574v2 — FLAX: Nb47Ti + PFA",
+    "Krinner2019": "arXiv:1806.07862v1 — 不鏽鋼 / NbTi 同軸線",
+    "DelftCriOFlex3": "Kapton/polyimide 介電 + NbTi (SSOT: NbTi runtime_polyfit null)"
+  },
+  "materials": [
+    {
+      "name": "Copper (OFHC)",
+      "role": "導體/屏蔽 (OFHC Cu；RRR 變體)",
+      "cables": [
+        "SC coax 內/外導體",
+        "一般低溫導體"
+      ],
+      "note": "5 個 RRR 變體 (50/100/150/300/500)；rational_copper 形式；僅 RRR 明確時選用。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity RRR = 50",
+          "coeffs_a_i": [
+            1.8743,
+            -0.41538,
+            -0.6018,
+            0.13294,
+            0.26426,
+            -0.0219,
+            -0.051276,
+            0.0014871,
+            0.003723
+          ],
+          "equation_form": "rational",
+          "data_range": "4K-300K",
+          "equation_range": "",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 320.38313292525186,
+            "77": 515.0743226194302,
+            "293": 392.8078995166582
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/OFHC%20Copper/OFHC_Copper_rev1.htm"
+        },
+        {
+          "label": "Thermal Conductivity RRR = 100",
+          "coeffs_a_i": [
+            2.2154,
+            -0.47461,
+            -0.88068,
+            0.13871,
+            0.29505,
+            -0.02043,
+            -0.04831,
+            0.001281,
+            0.003207
+          ],
+          "equation_form": "rational",
+          "data_range": "4K-300K",
+          "equation_range": "",
+          "fit_error_pct": "1",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 642.2969607429585,
+            "77": 547.1996980793605,
+            "293": 396.9085471371211
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/OFHC%20Copper/OFHC_Copper_rev1.htm"
+        },
+        {
+          "label": "Thermal Conductivity RRR = 150",
+          "coeffs_a_i": [
+            2.3797,
+            -0.4918,
+            -0.98615,
+            0.13942,
+            0.30475,
+            -0.019713,
+            -0.046897,
+            0.0011969,
+            0.0029988
+          ],
+          "equation_form": "rational",
+          "data_range": "4K-300K",
+          "equation_range": "",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 961.762514716873,
+            "77": 555.8463755648177,
+            "293": 398.2676429080411
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/OFHC%20Copper/OFHC_Copper_rev1.htm"
+        },
+        {
+          "label": "Thermal Conductivity RRR = 300",
+          "coeffs_a_i": [
+            1.357,
+            0.3981,
+            2.669,
+            -0.1346,
+            -0.6683,
+            0.01342,
+            0.05773,
+            0.0002147,
+            0.0
+          ],
+          "equation_form": "rational",
+          "data_range": "4K-300K",
+          "equation_range": "",
+          "fit_error_pct": "1",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 1888.3793110693216,
+            "77": 572.1196598437356,
+            "293": 399.29319501442575
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/OFHC%20Copper/OFHC_Copper_rev1.htm"
+        },
+        {
+          "label": "Thermal Conductivity RRR = 500",
+          "coeffs_a_i": [
+            2.8075,
+            -0.54074,
+            -1.2777,
+            0.15362,
+            0.36444,
+            -0.02105,
+            -0.051727,
+            0.0012226,
+            0.0030964
+          ],
+          "equation_form": "rational",
+          "data_range": "4K-300K",
+          "equation_range": "",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 3181.6852535067287,
+            "77": 579.0366064778324,
+            "293": 401.83080135561505
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/OFHC%20Copper/OFHC_Copper_rev1.htm"
+        }
+      ]
+    },
+    {
+      "name": "Teflon",
+      "role": "介電質 PTFE",
+      "cables": [
+        "SC-086/50-SCN-CN 半剛性同軸 (Raicu 2025)",
+        "一般 PTFE 同軸介電"
+      ],
+      "note": "NIST 官網 κ 係數 a0=2.738；不同製程/結晶度可差數倍，選用需對照實際電纜介電。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            2.738,
+            -30.677,
+            89.43,
+            -136.99,
+            124.69,
+            -69.556,
+            23.32,
+            -4.3135,
+            0.33829
+          ],
+          "equation_form": "log_log",
+          "data_range": "4-300",
+          "equation_range": "4-300",
+          "fit_error_pct": "5",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 0.04599485452078777,
+            "77": 0.2323918010237005,
+            "293": 0.27258720936236347
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/Teflon/Teflon_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Polyimide (Kapton)",
+      "role": "介電質基材 Polyimide",
+      "cables": [
+        "Cri/oFlex 3 (Delft)",
+        "NbTi-on-polyimide flex",
+        "FLAX 替代比較"
+      ],
+      "note": "Cri/oFlex 3 的 Kapton 另有專屬擬合 (Kapton (Cri/oFlex 3))；此為 NIST 通用值。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            5.73101,
+            -39.5199,
+            79.9313,
+            -83.8572,
+            50.9157,
+            -17.9835,
+            3.42413,
+            -0.27133,
+            0.0
+          ],
+          "equation_form": "log_log",
+          "data_range": "4-300",
+          "equation_range": "4-300",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 0.010789122886097256,
+            "77": 0.125521904011156,
+            "293": 0.19072299969147002
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/Polyimide%20Kapton/PolyimideKapton_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Stainless Steel 304",
+      "role": "外導體/支撐 (不鏽鋼)",
+      "cables": [
+        "不鏽鋼同軸線 (Krinner 2019)",
+        "semi-rigid coax 外導體"
+      ],
+      "note": "304/304L/316 在 SSOT 共用係數；NIST 官網亦相同 → 屬上游通用擬合。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            -1.4087,
+            1.3982,
+            0.2543,
+            -0.626,
+            0.2334,
+            0.4256,
+            -0.4658,
+            0.165,
+            -0.0199
+          ],
+          "equation_form": "log_log",
+          "data_range": "4-300",
+          "equation_range": "1-300",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 0.2723961889664811,
+            "77": 7.920651602258382,
+            "293": 15.12334394314148
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/304Stainless/304Stainless_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Stainless Steel 304L",
+      "role": "外導體/支撐 (不鏽鋼 304L)",
+      "cables": [
+        "不鏽鋼同軸線 (Krinner 2019)"
+      ],
+      "note": "與 304/316 共用 κ 係數。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            -1.4087,
+            1.3982,
+            0.2543,
+            -0.626,
+            0.2334,
+            0.4256,
+            -0.4658,
+            0.165,
+            -0.0199
+          ],
+          "equation_form": "log_log",
+          "data_range": "4-300",
+          "equation_range": "1-300",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 0.2723961889664811,
+            "77": 7.920651602258382,
+            "293": 15.12334394314148
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/304LStainless/304LStainless_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Stainless Steel 316",
+      "role": "外導體/護套 (不鏽鋼 316)",
+      "cables": [
+        "不鏽鋼同軸線 (Krinner 2019)"
+      ],
+      "note": "與 304/304L 共用 κ 係數。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            -1.4087,
+            1.3982,
+            0.2543,
+            -0.626,
+            0.2334,
+            0.4256,
+            -0.4658,
+            0.165,
+            -0.0199
+          ],
+          "equation_form": "log_log",
+          "data_range": "4-300",
+          "equation_range": "1-300",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 0.2723961889664811,
+            "77": 7.920651602258382,
+            "293": 15.12334394314148
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/316Stainless/316Stainless_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Beryllium Copper",
+      "role": "彈性導體/connector",
+      "cables": [
+        "同軸連接器彈簧接觸"
+      ],
+      "note": "有效範圍較窄， connector 局部用。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            -0.50015,
+            1.9319,
+            -1.6954,
+            0.71218,
+            1.2788,
+            -1.6145,
+            0.68722,
+            -0.10501,
+            0.0
+          ],
+          "equation_form": "log_log",
+          "data_range": "2-80",
+          "equation_range": "1-120",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 1.8787680252180128,
+            "77": 36.28874818405957,
+            "293": 9.956819834300791
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/Beryllium%20Copper/BerylliumCopper_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Brass",
+      "role": "連接器/接頭",
+      "cables": [
+        "同軸接頭 (connector)"
+      ],
+      "note": "有效範圍 5–116 K。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            0.021035,
+            -1.01835,
+            4.54083,
+            -5.03374,
+            3.20536,
+            -1.12933,
+            0.174057,
+            -0.0038151,
+            0.0
+          ],
+          "equation_form": "log_log",
+          "data_range": "5-116",
+          "equation_range": "5-110",
+          "fit_error_pct": "1.5",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 1.9739650476935267,
+            "77": 39.79577522853466,
+            "293": 163.41035102559405
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/Brass/Brass_rev.htm"
+        }
+      ]
+    },
+    {
+      "name": "Invar (Fe-36Ni)",
+      "role": "低熱膨脹支撐/屏蔽",
+      "cables": [
+        "低溫對準結構/屏蔽"
+      ],
+      "note": "膨脹匹配用途；非主要導電層。",
+      "variants": [
+        {
+          "label": "Thermal Conductivity",
+          "coeffs_a_i": [
+            -2.7064,
+            8.5191,
+            -15.923,
+            18.276,
+            -11.9116,
+            4.40318,
+            -0.86018,
+            0.068508,
+            0.0
+          ],
+          "equation_form": "log_log",
+          "data_range": "4-300",
+          "equation_range": "4-300",
+          "fit_error_pct": "2",
+          "kappa_WmK_at_4_77_293K": {
+            "4": 0.2418634292229617,
+            "77": 6.1890858340877095,
+            "293": 13.761595959983925
+          },
+          "url": "https://trc.nist.gov/cryogenics/materials/Invar(Fe-36Ni)/Invar_rev.htm"
+        }
+      ]
+    }
+  ],
+  "excluded": [],
+  "literature_based_entries_note": "C7150 / Ag-coated C7150 / PFA / NbTi 無 NIST 官網條目；見 SSOT heatload-coff-nist 的 Raicu Table 4/6 四筆與 Kapton/NbTi (Cri/oFlex 3) 兩筆（源自 arXiv 文獻，非 NIST）。"
+}
