@@ -370,7 +370,7 @@ The all-layer Q ≈ 3.37×10⁻⁴ W (≈336,752 nW) is dominated by two Cu plat
 
 ## Appendix B. Rebuilt NIST Database (cryogenic transmission-line subset)
 
-> A representative four-material subset is shown below (one-page display). The complete rebuilt database — nine transmission-line materials plus the full 42-material NIST scrape with coefficients, ranges and fit errors — is available for download: [nist_transmission_line_materials.json](https://raw.githubusercontent.com/phycomp/heatload/master/docs/nist_transmission_line_materials.json) and [nist_material_db_scraped.json](https://raw.githubusercontent.com/phycomp/heatload/master/docs/nist_material_db_scraped.json). Coefficients are transcribed verbatim from the NIST TRC cryogenic material-properties website; no refitting, no invented coefficients; the pre-existing database was not modified.
+> A representative four-material subset is shown below (one-page display). The complete rebuilt database — nine transmission-line materials plus the full 42-material NIST scrape with coefficients, ranges and fit errors — is available for download: nist_transmission_line_materials.json at <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_transmission_line_materials.json>, and nist_material_db_scraped.json at <https://raw.githubusercontent.com/phycomp/heatload/main/docs/nist_material_db_scraped.json>. Coefficients are transcribed verbatim from the NIST TRC cryogenic material-properties website; no refitting, no invented coefficients; the pre-existing database was not modified.
 
 | Material | Role | Cable use | Variants | Data range (K) |
 |---|---|---|---:|---|
